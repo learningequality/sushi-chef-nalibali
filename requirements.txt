@@ -1,0 +1,2 @@
+ricecooker>=0.6.6
+jupyter==1.0.0
