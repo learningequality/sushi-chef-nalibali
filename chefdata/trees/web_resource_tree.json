@@ -6,32 +6,142 @@
     {
       "title": "Multilingual stories",
       "image_url": "http://nalibali.org/sites/default/files/images/multilingual-stories.jpg",
-      "body_text": " Looking for stories to read in a range of African languages and English? Try our growing collection of stories to print out or read aloud.\u00a0\n ",
-      "stories_url": "http://nalibali.org/story-library/multilingual-stories"
+      "body_text": "Looking for stories to read in a range of African languages and English? Try our growing collection of stories to print out or read aloud.",
+      "stories_url": "http://nalibali.org/story-library/multilingual-stories",
+      "paginations": [
+        {
+          "url": "http://nalibali.org/story-library/multilingual-stories",
+          "page": 0,
+          "name": "1"
+        },
+        {
+          "url": "http://nalibali.org/story-library/multilingual-stories?type=multilingual_story&field_language_tid=11&title=&page=1",
+          "page": "1",
+          "name": "2"
+        },
+        {
+          "url": "http://nalibali.org/story-library/multilingual-stories?type=multilingual_story&field_language_tid=11&title=&page=2",
+          "page": "2",
+          "name": "3"
+        },
+        {
+          "url": "http://nalibali.org/story-library/multilingual-stories?type=multilingual_story&field_language_tid=11&title=&page=3",
+          "page": "3",
+          "name": "4"
+        },
+        {
+          "url": "http://nalibali.org/story-library/multilingual-stories?type=multilingual_story&field_language_tid=11&title=&page=4",
+          "page": "4",
+          "name": "5"
+        },
+        {
+          "url": "http://nalibali.org/story-library/multilingual-stories?type=multilingual_story&field_language_tid=11&title=&page=5",
+          "page": "5",
+          "name": "6"
+        },
+        {
+          "url": "http://nalibali.org/story-library/multilingual-stories?type=multilingual_story&field_language_tid=11&title=&page=6",
+          "page": "6",
+          "name": "7"
+        }
+      ]
     },
     {
       "title": "Audio stories",
       "image_url": "http://nalibali.org/sites/default/files/images/audio-stories.jpg",
-      "body_text": " Browse our archive of audio stories in partnership with SABC Education to enjoy at home, at school or in your reading club.\u00a0\n ",
-      "stories_url": "http://nalibali.org/story-library/audio-stories"
+      "body_text": "Browse our archive of audio stories in partnership with SABC Education to enjoy at home, at school or in your reading club.",
+      "stories_url": "http://nalibali.org/story-library/audio-stories",
+      "paginations": [
+        {
+          "url": "http://nalibali.org/story-library/audio-stories",
+          "page": 0,
+          "name": "1"
+        }
+      ]
     },
     {
       "title": "Story cards",
       "image_url": "http://nalibali.org/sites/default/files/images/story-cards.jpg",
-      "body_text": " Grow your children's\u00a0love of reading by printing out our beautifully illustrated story cards containing traditional and modern stories.\u00a0\n ",
-      "stories_url": "http://nalibali.org/story-library/story-cards"
+      "body_text": "Grow your children's\u00a0love of reading by printing out our beautifully illustrated story cards containing traditional and modern stories.",
+      "stories_url": "http://nalibali.org/story-library/story-cards",
+      "paginations": [
+        {
+          "url": "http://nalibali.org/story-library/story-cards",
+          "page": 0,
+          "name": "1"
+        },
+        {
+          "url": "http://nalibali.org/story-library/story-cards?field_sc_languages_tid=11&title=&page=1",
+          "page": "1",
+          "name": "2"
+        }
+      ]
     },
     {
       "title": "Story seeds",
       "image_url": "http://nalibali.org/sites/default/files/images/story-seeds.jpg",
-      "body_text": " Do you want to tell your own stories but sometimes find it a bit difficult to get going? Here are some ideas to get you started - available in 6 SA languages.\u00a0\n ",
-      "stories_url": "http://nalibali.org/story-library/story-seeds"
+      "body_text": "Do you want to tell your own stories but sometimes find it a bit difficult to get going? Here are some ideas to get you started - available in 6 SA languages.",
+      "stories_url": "http://nalibali.org/story-library/story-seeds",
+      "paginations": [
+        {
+          "url": "http://nalibali.org/story-library/story-seeds",
+          "page": 0,
+          "name": "1"
+        }
+      ]
     },
     {
       "title": "Your stories",
       "image_url": "http://nalibali.org/sites/default/files/images/your-stories.jpg",
-      "body_text": " Want to submit your own stories? Check out our selection of poems, stories and writings created by you - or send us your own here!\u00a0\n ",
-      "stories_url": "http://nalibali.org/story-library/your-stories"
+      "body_text": "Want to submit your own stories? Check out our selection of poems, stories and writings created by you - or send us your own here!",
+      "stories_url": "http://nalibali.org/story-library/your-stories",
+      "paginations": [
+        {
+          "url": "http://nalibali.org/story-library/your-stories",
+          "page": 0,
+          "name": "1"
+        },
+        {
+          "url": "http://nalibali.org/story-library/your-stories?page=1",
+          "page": "1",
+          "name": "2"
+        },
+        {
+          "url": "http://nalibali.org/story-library/your-stories?page=2",
+          "page": "2",
+          "name": "3"
+        },
+        {
+          "url": "http://nalibali.org/story-library/your-stories?page=3",
+          "page": "3",
+          "name": "4"
+        },
+        {
+          "url": "http://nalibali.org/story-library/your-stories?page=4",
+          "page": "4",
+          "name": "5"
+        },
+        {
+          "url": "http://nalibali.org/story-library/your-stories?page=5",
+          "page": "5",
+          "name": "6"
+        },
+        {
+          "url": "http://nalibali.org/story-library/your-stories?page=6",
+          "page": "6",
+          "name": "7"
+        },
+        {
+          "url": "http://nalibali.org/story-library/your-stories?page=7",
+          "page": "7",
+          "name": "8"
+        },
+        {
+          "url": "http://nalibali.org/story-library/your-stories?page=8",
+          "page": "8",
+          "name": "9"
+        }
+      ]
     }
   ]
 }

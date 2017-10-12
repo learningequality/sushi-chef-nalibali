@@ -4,6 +4,7 @@ import os
 import logging
 import requests
 import json
+from re import compile
 from bs4 import BeautifulSoup
 
 from le_utils.constants import content_kinds, licenses
@@ -48,6 +49,8 @@ class Html:
 
 # Chef
 class NalibaliChef(JsonTreeChef):
+
+    # Constants
     HOSTNAME = 'nalibali.org'
     ROOT_URL = f'http://{HOSTNAME}/story-library'
     DATA_DIR = 'chefdata'
@@ -55,9 +58,13 @@ class NalibaliChef(JsonTreeChef):
     CRAWLING_STAGE_OUTPUT = 'web_resource_tree.json'
     SCRAPING_STAGE_OUTPUT = 'ricecooker_json_tree.json'
 
+    # Matching regexes
+    STORY_PAGE_LINK_RE = compile(r'^.+page=(?P<page>\d+)$')
+
     def __init__(self, html, logger):
         self._html = html
         self._logger = logger
+
 
     def __absolute_url(self, url):
         if url.startswith("//"):
@@ -66,11 +73,13 @@ class NalibaliChef(JsonTreeChef):
             return f'http://{NalibaliChef.HOSTNAME}{url}'
         return url
 
+    def __get_text(self, elem):
+        return "" if elem is None else elem.get_text().replace('\r', '').replace('\n', ' ').strip()
 
     def __to_story_hierarchy(self, div):
-        title = div.find('h2').get_text().strip()
+        title = self.__get_text(div.find('h2'))
         image_url = div.find('img', class_='img-responsive')['src']
-        body_text = div.find('div', class_='body').get_text()
+        body_text = self.__get_text(div.find('div', class_='body'))
         stories_url = self.__absolute_url(div.find('div', class_='views-field').find('a', class_='btn link')['href'])
         return dict(
             title=title,
@@ -84,16 +93,55 @@ class NalibaliChef(JsonTreeChef):
         vocabulary_div = content_div.find('div', class_='view-vocabulary')
         stories_divs = vocabulary_div.find_all('div', 'views-row')
         story_hierarchies = list(map(self.__to_story_hierarchy, stories_divs))
+        paginations_dict = dict(map(self._crawl_story_hierarchy, story_hierarchies))
+        for h in story_hierarchies:
+            paginations = paginations_dict.get(h['stories_url'])
+            if paginations:
+                h['paginations'] = paginations
         return story_hierarchies
-        # return list(map(self._crawl_story_hierarchy, story_hierarchies))
 
-    def _crawl_all_pages(page):
-        pass
+    def _to_pagination(self, anchor):
+        href = anchor['href']
+        m = NalibaliChef.STORY_PAGE_LINK_RE.match(href)
+        if not m:
+            raise Exception('STORY_PAGE_LINK_RE could not match')
+        groups = m.groupdict()
+        pagination=dict(
+            url=self.__absolute_url(href),
+            page=groups['page'],
+            name=self.__get_text(anchor),
+        )
+        return pagination
+
+    def _crawl_pagination(self, url):
+        page = self._html.get(url)
+        pagination_ul = page.find('ul', class_='pagination')
+
+        if not pagination_ul:
+            print(f'There is no pagination area for `{url}`')
+            return []
+
+        anchors = pagination_ul.find_all('a', attrs={'href': NalibaliChef.STORY_PAGE_LINK_RE})
+        paginations = list(map(self._to_pagination, anchors))
+        paginations_dict = {p['page']: p for p in paginations}
+        actual_paginations = [p for p in paginations if ('next' not in p['name']  and 'last' not in p['name'] and 'first' not in p['name'] and 'previous' not in p['name'] and '>' not in p['name'] and p['name'] != '')]
+        last = paginations_dict.get('last')
+        if not last:
+            return actual_paginations
+        current_last = actual_paginations[-1]
+        if current_last['page'] == last['page']:
+            return actual_paginations
+        return actual_paginations.extend(self._crawl_pagination(current_last['url']))
 
     def _crawl_story_hierarchy(self, hierarchy):
         stories_url = hierarchy['stories_url']
-        stories_first_page =self._html.get(stories_url)
-        self._crawl_all_pages(stories_first_page)
+        paginations = self._crawl_pagination(stories_url)
+        paginations.insert(0, dict(
+                url=stories_url,
+                page=0,
+                name='1',
+            ))
+        return stories_url, paginations
 
     # Crawling
     # For every story hierarchy:
