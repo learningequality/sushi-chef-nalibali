@@ -3,6 +3,7 @@
 import os
 import logging
 import requests
+import json
 from bs4 import BeautifulSoup
 
 from le_utils.constants import content_kinds, licenses
@@ -54,8 +55,9 @@ class NalibaliChef(JsonTreeChef):
     CRAWLING_STAGE_OUTPUT = 'web_resource_tree.json'
     SCRAPING_STAGE_OUTPUT = 'ricecooker_json_tree.json'
 
-    def __init__(self, html):
+    def __init__(self, html, logger):
         self._html = html
+        self._logger = logger
 
     def __absolute_url(self, url):
         if url.startswith("//"):
@@ -85,9 +87,13 @@ class NalibaliChef(JsonTreeChef):
         return story_hierarchies
         # return list(map(self._crawl_story_hierarchy, story_hierarchies))
 
+    def _crawl_all_pages(page):
+        pass
+
     def _crawl_story_hierarchy(self, hierarchy):
         stories_url = hierarchy['stories_url']
         stories_first_page =self._html.get(stories_url)
+        self._crawl_all_pages(stories_first_page)
 
     # Crawling
     # For every story hierarchy:
@@ -99,6 +105,16 @@ class NalibaliChef(JsonTreeChef):
     def crawl(self, args, options):
         root_page = self._html.get(NalibaliChef.ROOT_URL)
         story_hierarchies = self._crawl_story_hierarchies(root_page)
+        web_resource_tree = dict(
+            kind="NalibaliWebResourceTree",
+            title="Nalibali Web Resource Tree",
+            language='en',
+            children=story_hierarchies,
+        )
+        json_file_name = os.path.join(NalibaliChef.TREES_DATA_DIR, NalibaliChef.CRAWLING_STAGE_OUTPUT)
+        with open(json_file_name, 'w') as json_file:
+            json.dump(web_resource_tree, json_file, indent=2)
+            self._logger.info('Crawling results stored in ' + json_file_name)
         return story_hierarchies
 
     def scrape(self, args, options):
@@ -114,15 +130,15 @@ class NalibaliChef(JsonTreeChef):
 
 
     def get_json_tree_path(self, **kwargs):
-        json_tree_path = os.path.join(TREES_DATA_DIR, SCRAPING_STAGE_OUTPUT)
+        json_tree_path = os.path.join(NalibaliChef.TREES_DATA_DIR, NalibaliChef.SCRAPING_STAGE_OUTPUT)
         return json_tree_path
 
 def __get_testing_chef():
     http_session = create_http_session(NalibaliChef.HOSTNAME)
     logger = create_logger()
-    return NalibaliChef(Html(http_session, logger))
+    return NalibaliChef(Html(http_session, logger), logger)
 
 if __name__ == '__main__':
     http_session = create_http_session(NalibaliChef.HOSTNAME)
     logger = create_logger()
-    NalibaliChef(Html(http_session, logger)).main()
+    NalibaliChef(Html(http_session, logger), logger).main()

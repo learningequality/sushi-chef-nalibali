@@ -1,0 +1,37 @@
+{
+  "kind": "NalibaliWebResourceTree",
+  "title": "Nalibali Web Resource Tree",
+  "language": "en",
+  "children": [
+    {
+      "title": "Multilingual stories",
+      "image_url": "http://nalibali.org/sites/default/files/images/multilingual-stories.jpg",
+      "body_text": " Looking for stories to read in a range of African languages and English? Try our growing collection of stories to print out or read aloud.\u00a0\n ",
+      "stories_url": "http://nalibali.org/story-library/multilingual-stories"
+    },
+    {
+      "title": "Audio stories",
+      "image_url": "http://nalibali.org/sites/default/files/images/audio-stories.jpg",
+      "body_text": " Browse our archive of audio stories in partnership with SABC Education to enjoy at home, at school or in your reading club.\u00a0\n ",
+      "stories_url": "http://nalibali.org/story-library/audio-stories"
+    },
+    {
+      "title": "Story cards",
+      "image_url": "http://nalibali.org/sites/default/files/images/story-cards.jpg",
+      "body_text": " Grow your children's\u00a0love of reading by printing out our beautifully illustrated story cards containing traditional and modern stories.\u00a0\n ",
+      "stories_url": "http://nalibali.org/story-library/story-cards"
+    },
+    {
+      "title": "Story seeds",
+      "image_url": "http://nalibali.org/sites/default/files/images/story-seeds.jpg",
+      "body_text": " Do you want to tell your own stories but sometimes find it a bit difficult to get going? Here are some ideas to get you started - available in 6 SA languages.\u00a0\n ",
+      "stories_url": "http://nalibali.org/story-library/story-seeds"
+    },
+    {
+      "title": "Your stories",
+      "image_url": "http://nalibali.org/sites/default/files/images/your-stories.jpg",
+      "body_text": " Want to submit your own stories? Check out our selection of poems, stories and writings created by you - or send us your own here!\u00a0\n ",
+      "stories_url": "http://nalibali.org/story-library/your-stories"
+    }
+  ]
+}
