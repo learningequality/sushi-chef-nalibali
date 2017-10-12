@@ -57,11 +57,37 @@ class NalibaliChef(JsonTreeChef):
     def __init__(self, html):
         self._html = html
 
-    def _crawl_stories(self, page):
-        return []
+    def __absolute_url(self, url):
+        if url.startswith("//"):
+            return "https:" + url
+        elif url.startswith("/"):
+            return f'http://{NalibaliChef.HOSTNAME}{url}'
+        return url
 
-    def _crawl_story(self, story):
-        return None
+
+    def __to_story_hierarchy(self, div):
+        title = div.find('h2').get_text().strip()
+        image_url = div.find('img', class_='img-responsive')['src']
+        body_text = div.find('div', class_='body').get_text()
+        stories_url = self.__absolute_url(div.find('div', class_='views-field').find('a', class_='btn link')['href'])
+        return dict(
+            title=title,
+            image_url=image_url,
+            body_text=body_text,
+            stories_url=stories_url,
+        )
+
+    def _crawl_story_hierarchies(self, page):
+        content_div = page.find('div', class_='region-content')
+        vocabulary_div = content_div.find('div', class_='view-vocabulary')
+        stories_divs = vocabulary_div.find_all('div', 'views-row')
+        story_hierarchies = list(map(self.__to_story_hierarchy, stories_divs))
+        return story_hierarchies
+        # return list(map(self._crawl_story_hierarchy, story_hierarchies))
+
+    def _crawl_story_hierarchy(self, hierarchy):
+        stories_url = hierarchy['stories_url']
+        stories_first_page =self._html.get(stories_url)
 
     # Crawling
     # For every story hierarchy:
@@ -72,9 +98,8 @@ class NalibaliChef(JsonTreeChef):
     #           Keep language->[story URL]
     def crawl(self, args, options):
         root_page = self._html.get(NalibaliChef.ROOT_URL)
-        stories = self._crawl_stories(root_page)
-        for story in stories:
-            self._crawl_story(story)
+        story_hierarchies = self._crawl_story_hierarchies(root_page)
+        return story_hierarchies
 
     def scrape(self, args, options):
         kwargs = {}     # combined dictionary of argparse args and extra options
