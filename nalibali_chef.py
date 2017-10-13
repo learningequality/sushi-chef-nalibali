@@ -153,7 +153,13 @@ class NalibaliChef(JsonTreeChef):
         links = div.find('div', class_='links')
         anchors = links.find_all('a') if links else []
         story_by_language = {
-            self.__get_text(anchor).lower(): self.__absolute_url(anchor['href'])
+            self.__get_text(anchor).lower(): dict(
+                kind='NalibaliLocalizedStory',
+                title=title,
+                posted_date=posted_date,
+                author=author,
+                href=self.__absolute_url(anchor['href']),
+            )
             for anchor in anchors
         }
         return dict(
