@@ -8,6 +8,7 @@ from re import compile
 from bs4 import BeautifulSoup
 
 from le_utils.constants import content_kinds, licenses
+from le_utils.constants.languages import getlang_by_native_name
 from ricecooker.chefs import JsonTreeChef
 from ricecooker.classes.licenses import get_license
 from ricecooker.utils.caching import CacheForeverHeuristic, FileCache, CacheControlAdapter, InvalidatingCacheControlAdapter
@@ -219,16 +220,44 @@ class NalibaliChef(JsonTreeChef):
 
     # Scraping
     def _scrape_multilingual_stories_hierarchy(self, stories_hierarchy):
-        return None
+        assert stories_hierarchy['kind'] == 'NalibaliMultilingualStoriesHierarchy'
+        items = stories_hierarchy['children'].items()
+        stories_hierarchy_by_language = [None] * len(items)
+
+        # TODO: Set the values for source_id, description,
+        for i, (language, stories) in enumerate(items):
+            language_node = dict(
+                kind=content_kinds.TOPIC,
+                source_id='',
+                title=language,
+                language=getlang_by_native_name(language).code,
+                description='',
+                children=[],
+            )
+            stories_hierarchy_by_language[i] = language_node
+
+        return stories_hierarchy_by_language
+
 
     def scrape(self, args, options):
         kwargs = {}     # combined dictionary of argparse args and extra options
         kwargs.update(args)
         kwargs.update(options)
+
         with open(os.path.join(NalibaliChef.TREES_DATA_DIR, NalibaliChef.CRAWLING_STAGE_OUTPUT), 'r') as json_file:
             web_resource_tree = json.load(json_file)
             assert web_resource_tree['kind'] == 'NalibaliWebResourceTree'
-        ricecooker_json_tree = self._scrape_multilingual_stories_hierarchy(web_resource_tree)
+
+        ricecooker_json_tree = dict(
+            source_domain=NalibaliChef.HOSTNAME,
+            source_id='nalibali',
+            title=web_resource_tree['title'],
+            description='',
+            language='en',
+            thumbnail='',
+            children=[],
+        )
+        ricecooker_json_tree['children'] = self._scrape_multilingual_stories_hierarchy(web_resource_tree['children'][0])
         write_tree_to_json_tree(os.path.join(NalibaliChef.TREES_DATA_DIR, NalibaliChef.SCRAPING_STAGE_OUTPUT) , ricecooker_json_tree)
         return ricecooker_json_tree
 

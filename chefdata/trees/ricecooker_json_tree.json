@@ -1,1 +1,98 @@
-null
+{
+  "source_domain": "nalibali.org",
+  "source_id": "nalibali",
+  "title": "Nalibali Web Resource Tree",
+  "description": "",
+  "language": "en",
+  "thumbnail": "",
+  "children": [
+    {
+      "kind": "topic",
+      "source_id": "",
+      "title": "English",
+      "language": "en",
+      "description": "",
+      "children": []
+    },
+    {
+      "kind": "topic",
+      "source_id": "",
+      "title": "Afrikaans",
+      "language": "af",
+      "description": "",
+      "children": []
+    },
+    {
+      "kind": "topic",
+      "source_id": "",
+      "title": "isiXhosa",
+      "language": "xho",
+      "description": "",
+      "children": []
+    },
+    {
+      "kind": "topic",
+      "source_id": "",
+      "title": "isiZulu",
+      "language": "zul",
+      "description": "",
+      "children": []
+    },
+    {
+      "kind": "topic",
+      "source_id": "",
+      "title": "Sesotho",
+      "language": "sot",
+      "description": "",
+      "children": []
+    },
+    {
+      "kind": "topic",
+      "source_id": "",
+      "title": "Sepedi",
+      "language": "nso",
+      "description": "",
+      "children": []
+    },
+    {
+      "kind": "topic",
+      "source_id": "",
+      "title": "Tshivenda",
+      "language": "ve",
+      "description": "",
+      "children": []
+    },
+    {
+      "kind": "topic",
+      "source_id": "",
+      "title": "isiNdebele",
+      "language": "nr",
+      "description": "",
+      "children": []
+    },
+    {
+      "kind": "topic",
+      "source_id": "",
+      "title": "Setswana",
+      "language": "tsn",
+      "description": "",
+      "children": []
+    },
+    {
+      "kind": "topic",
+      "source_id": "",
+      "title": "Siswati",
+      "language": "ss",
+      "description": "",
+      "children": []
+    },
+    {
+      "kind": "topic",
+      "source_id": "",
+      "title": "Xitsonga",
+      "language": "ts",
+      "description": "",
+      "children": []
+    }
+  ]
+}

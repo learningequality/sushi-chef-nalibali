@@ -1,2 +1,3 @@
+git+https://github.com/ivanistheone/le-utils@feature/missing_lang_codes
 ricecooker>=0.6.6
 jupyter==1.0.0
