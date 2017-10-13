@@ -82,6 +82,7 @@ class NalibaliChef(JsonTreeChef):
         body_text = self.__get_text(div.find('div', class_='body'))
         stories_url = self.__absolute_url(div.find('div', class_='views-field').find('a', class_='btn link')['href'])
         return dict(
+            kind='NalibaliHierarchy',
             title=title,
             image_url=image_url,
             body_text=body_text,
@@ -107,6 +108,7 @@ class NalibaliChef(JsonTreeChef):
             raise Exception('STORY_PAGE_LINK_RE could not match')
         groups = m.groupdict()
         pagination=dict(
+            kind='NalibaliPagination',
             url=self.__absolute_url(href),
             page=groups['page'],
             name=self.__get_text(anchor),
@@ -155,6 +157,7 @@ class NalibaliChef(JsonTreeChef):
             for anchor in anchors
         }
         return dict(
+            kind='NalibaliStory',
             title=title,
             posted_date=posted_date,
             author=author,
@@ -174,6 +177,7 @@ class NalibaliChef(JsonTreeChef):
         stories_url = hierarchy['stories_url']
         paginations = self._crawl_pagination(stories_url)
         paginations.insert(0, dict(
+                kind='NalibaliPagination',
                 url=stories_url,
                 page=0,
                 name='1',
