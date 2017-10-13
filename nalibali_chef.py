@@ -82,7 +82,7 @@ class NalibaliChef(JsonTreeChef):
         body_text = self.__get_text(div.find('div', class_='body'))
         stories_url = self.__absolute_url(div.find('div', class_='views-field').find('a', class_='btn link')['href'])
         return dict(
-            kind='NalibaliHierarchy',
+            kind='NalibaliMultilingualStoriesHierarchy',
             title=title,
             image_url=image_url,
             body_text=body_text,
@@ -153,12 +153,12 @@ class NalibaliChef(JsonTreeChef):
         links = div.find('div', class_='links')
         anchors = links.find_all('a') if links else []
         story_by_language = {
-            self.__get_text(anchor).lower(): dict(
+            self.__get_text(anchor): dict(
                 kind='NalibaliLocalizedStory',
                 title=title,
                 posted_date=posted_date,
                 author=author,
-                language=self.__get_text(anchor).lower(),
+                language=self.__get_text(anchor),
                 href=self.__absolute_url(anchor['href']),
             )
             for anchor in anchors
@@ -217,21 +217,25 @@ class NalibaliChef(JsonTreeChef):
             self._logger.info('Crawling results stored in ' + json_file_name)
         return story_hierarchies
 
+    # Scraping
+    def _scrape_multilingual_stories_hierarchy(self, stories_hierarchy):
+        return None
+
     def scrape(self, args, options):
         kwargs = {}     # combined dictionary of argparse args and extra options
         kwargs.update(args)
         kwargs.update(options)
-        json_tree_path = self.get_json_tree_path(**kwargs)
-        pass
+        with open(os.path.join(NalibaliChef.TREES_DATA_DIR, NalibaliChef.CRAWLING_STAGE_OUTPUT), 'r') as json_file:
+            web_resource_tree = json.load(json_file)
+            assert web_resource_tree['kind'] == 'NalibaliWebResourceTree'
+        ricecooker_json_tree = self._scrape_multilingual_stories_hierarchy(web_resource_tree)
+        write_tree_to_json_tree(os.path.join(NalibaliChef.TREES_DATA_DIR, NalibaliChef.SCRAPING_STAGE_OUTPUT) , ricecooker_json_tree)
+        return ricecooker_json_tree
 
     def pre_run(self, args, options):
         self.crawl(args, options)
         self.scrape(args, options)
 
-
-    def get_json_tree_path(self, **kwargs):
-        json_tree_path = os.path.join(NalibaliChef.TREES_DATA_DIR, NalibaliChef.SCRAPING_STAGE_OUTPUT)
-        return json_tree_path
 
 def __get_testing_chef():
     http_session = create_http_session(NalibaliChef.HOSTNAME)
