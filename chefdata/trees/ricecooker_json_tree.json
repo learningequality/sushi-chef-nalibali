@@ -7,92 +7,147 @@
   "thumbnail": "",
   "children": [
     {
-      "kind": "topic",
-      "source_id": "",
+      "kind": "html5",
+      "source_id": "English",
       "title": "English",
       "language": "en",
       "description": "",
-      "children": []
+      "files": [
+        {
+          "file_type": "HTMLZipFile",
+          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmp72giki4c.zip"
+        }
+      ]
     },
     {
-      "kind": "topic",
-      "source_id": "",
+      "kind": "html5",
+      "source_id": "Afrikaans",
       "title": "Afrikaans",
       "language": "af",
       "description": "",
-      "children": []
+      "files": [
+        {
+          "file_type": "HTMLZipFile",
+          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmpamu_039s.zip"
+        }
+      ]
     },
     {
-      "kind": "topic",
-      "source_id": "",
+      "kind": "html5",
+      "source_id": "isiXhosa",
       "title": "isiXhosa",
       "language": "xho",
       "description": "",
-      "children": []
+      "files": [
+        {
+          "file_type": "HTMLZipFile",
+          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmpvkh2njo3.zip"
+        }
+      ]
     },
     {
-      "kind": "topic",
-      "source_id": "",
+      "kind": "html5",
+      "source_id": "isiZulu",
       "title": "isiZulu",
       "language": "zul",
       "description": "",
-      "children": []
+      "files": [
+        {
+          "file_type": "HTMLZipFile",
+          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmp_v_26jw4.zip"
+        }
+      ]
     },
     {
-      "kind": "topic",
-      "source_id": "",
+      "kind": "html5",
+      "source_id": "Sesotho",
       "title": "Sesotho",
       "language": "sot",
       "description": "",
-      "children": []
+      "files": [
+        {
+          "file_type": "HTMLZipFile",
+          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmphfbixxpm.zip"
+        }
+      ]
     },
     {
-      "kind": "topic",
-      "source_id": "",
+      "kind": "html5",
+      "source_id": "Sepedi",
       "title": "Sepedi",
       "language": "nso",
       "description": "",
-      "children": []
+      "files": [
+        {
+          "file_type": "HTMLZipFile",
+          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmpopek0lfp.zip"
+        }
+      ]
     },
     {
-      "kind": "topic",
-      "source_id": "",
+      "kind": "html5",
+      "source_id": "Tshivenda",
       "title": "Tshivenda",
       "language": "ve",
       "description": "",
-      "children": []
+      "files": [
+        {
+          "file_type": "HTMLZipFile",
+          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmpgdctbpyd.zip"
+        }
+      ]
     },
     {
-      "kind": "topic",
-      "source_id": "",
+      "kind": "html5",
+      "source_id": "isiNdebele",
       "title": "isiNdebele",
       "language": "nr",
       "description": "",
-      "children": []
+      "files": [
+        {
+          "file_type": "HTMLZipFile",
+          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmpnbp0t273.zip"
+        }
+      ]
     },
     {
-      "kind": "topic",
-      "source_id": "",
+      "kind": "html5",
+      "source_id": "Setswana",
       "title": "Setswana",
       "language": "tsn",
       "description": "",
-      "children": []
+      "files": [
+        {
+          "file_type": "HTMLZipFile",
+          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmp_nxean3t.zip"
+        }
+      ]
     },
     {
-      "kind": "topic",
-      "source_id": "",
+      "kind": "html5",
+      "source_id": "Siswati",
       "title": "Siswati",
       "language": "ss",
       "description": "",
-      "children": []
+      "files": [
+        {
+          "file_type": "HTMLZipFile",
+          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmptqjt8axq.zip"
+        }
+      ]
     },
     {
-      "kind": "topic",
-      "source_id": "",
+      "kind": "html5",
+      "source_id": "Xitsonga",
       "title": "Xitsonga",
       "language": "ts",
       "description": "",
-      "children": []
+      "files": [
+        {
+          "file_type": "HTMLZipFile",
+          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmp2kykxtb5.zip"
+        }
+      ]
     }
   ]
 }

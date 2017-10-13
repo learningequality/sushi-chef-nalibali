@@ -6,6 +6,7 @@ import requests
 import json
 from re import compile
 from bs4 import BeautifulSoup
+import tempfile
 
 from le_utils.constants import content_kinds, licenses
 from le_utils.constants.languages import getlang_by_native_name
@@ -58,6 +59,7 @@ class NalibaliChef(JsonTreeChef):
     TREES_DATA_DIR = os.path.join(DATA_DIR, 'trees')
     CRAWLING_STAGE_OUTPUT = 'web_resource_tree.json'
     SCRAPING_STAGE_OUTPUT = 'ricecooker_json_tree.json'
+    ZIP_FILES_TMP_DIR = os.path.join(DATA_DIR, 'zipfiles')
 
     # Matching regexes
     STORY_PAGE_LINK_RE = compile(r'^.+page=(?P<page>\d+)$')
@@ -219,26 +221,6 @@ class NalibaliChef(JsonTreeChef):
         return story_hierarchies
 
     # Scraping
-    def _scrape_multilingual_stories_hierarchy(self, stories_hierarchy):
-        assert stories_hierarchy['kind'] == 'NalibaliMultilingualStoriesHierarchy'
-        items = stories_hierarchy['children'].items()
-        stories_hierarchy_by_language = [None] * len(items)
-
-        # TODO: Set the values for source_id, description,
-        for i, (language, stories) in enumerate(items):
-            language_node = dict(
-                kind=content_kinds.TOPIC,
-                source_id='',
-                title=language,
-                language=getlang_by_native_name(language).code,
-                description='',
-                children=[],
-            )
-            stories_hierarchy_by_language[i] = language_node
-
-        return stories_hierarchy_by_language
-
-
     def scrape(self, args, options):
         kwargs = {}     # combined dictionary of argparse args and extra options
         kwargs.update(args)
@@ -260,6 +242,58 @@ class NalibaliChef(JsonTreeChef):
         ricecooker_json_tree['children'] = self._scrape_multilingual_stories_hierarchy(web_resource_tree['children'][0])
         write_tree_to_json_tree(os.path.join(NalibaliChef.TREES_DATA_DIR, NalibaliChef.SCRAPING_STAGE_OUTPUT) , ricecooker_json_tree)
         return ricecooker_json_tree
+
+    def _scrape_multilingual_stories_hierarchy(self, stories_hierarchy):
+        assert stories_hierarchy['kind'] == 'NalibaliMultilingualStoriesHierarchy'
+        items = stories_hierarchy['children'].items()
+        stories_hierarchy_by_language = [None] * len(items)
+
+        # TODO: Set the values for source_id, description,
+        for i, (language, stories) in enumerate(items):
+            language_node = dict(
+                kind=content_kinds.HTML5,
+                source_id=language,
+                title=language,
+                language=getlang_by_native_name(language).code,
+                description='',
+            )
+            zip_path = self._scrape_multilingual_stories(stories)
+            html_zip_file = dict(
+                file_type='HTMLZipFile',
+                path=zip_path,
+            )
+            language_node['files'] = [html_zip_file]
+            stories_hierarchy_by_language[i] = language_node
+        return stories_hierarchy_by_language
+
+    def _scrape_multilingual_stories(self, stories):
+        dest_path = tempfile.mkdtemp(dir=NalibaliChef.ZIP_FILES_TMP_DIR)
+        basic_page_str = """
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="utf-8">
+            <title></title>
+          </head>
+          <body>
+          </body>
+        </html>"""
+        basic_page = BeautifulSoup(basic_page_str, "html.parser")
+        body = basic_page.find('body')
+        nav = basic_page.new_tag('nav')
+        ul = basic_page.new_tag('ul')
+        for story in stories:
+            li = basic_page.new_tag('li')
+            anchor = basic_page.new_tag('a', href='#')
+            anchor.string = story['title']
+            li.append(anchor)
+            ul.append(li)
+        nav.append(ul)
+        body.append(nav)
+        with open(os.path.join(dest_path, 'index.html'), 'w', encoding="utf8") as index_html:
+            index_html.write(str(basic_page))
+        zip_path = create_predictable_zip(dest_path)
+        return zip_path
 
     def pre_run(self, args, options):
         self.crawl(args, options)
