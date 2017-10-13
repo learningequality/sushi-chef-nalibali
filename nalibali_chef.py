@@ -158,6 +158,7 @@ class NalibaliChef(JsonTreeChef):
                 title=title,
                 posted_date=posted_date,
                 author=author,
+                language=self.__get_text(anchor).lower(),
                 href=self.__absolute_url(anchor['href']),
             )
             for anchor in anchors
