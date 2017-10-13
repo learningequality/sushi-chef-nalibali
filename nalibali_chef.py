@@ -92,12 +92,12 @@ class NalibaliChef(JsonTreeChef):
         content_div = page.find('div', class_='region-content')
         vocabulary_div = content_div.find('div', class_='view-vocabulary')
         stories_divs = vocabulary_div.find_all('div', 'views-row')
-        story_hierarchies = list(map(self.__to_story_hierarchy, stories_divs))
-        paginations_dict = dict(map(self._crawl_story_hierarchy, story_hierarchies))
+        story_hierarchies  = [h for h in map(self.__to_story_hierarchy, stories_divs) if h['title'] == "Multilingual stories"]
+        stories_dict = dict(map(self._crawl_story_hierarchy, story_hierarchies))
         for h in story_hierarchies:
-            paginations = paginations_dict.get(h['stories_url'])
-            if paginations:
-                h['paginations'] = paginations
+            stories = stories_dict.get(h['stories_url'])
+            if stories:
+                h['children'] = stories
         return story_hierarchies
 
     def _to_pagination(self, anchor):
@@ -118,7 +118,6 @@ class NalibaliChef(JsonTreeChef):
         pagination_ul = page.find('ul', class_='pagination')
 
         if not pagination_ul:
-            print(f'There is no pagination area for `{url}`')
             return []
 
         anchors = pagination_ul.find_all('a', attrs={'href': NalibaliChef.STORY_PAGE_LINK_RE})
@@ -133,6 +132,44 @@ class NalibaliChef(JsonTreeChef):
             return actual_paginations
         return actual_paginations.extend(self._crawl_pagination(current_last['url']))
 
+    def _to_story(self, div):
+        title_elem = div.find('span', property='dc:title')
+        title = ''
+        if title_elem:
+            title = title_elem['content']
+        else:
+            title_elem = div.find('div', class_='content')
+            if not title_elem:
+                return None
+            title = self.__get_text(title_elem.find('h3'))
+
+        if not title:
+            return None
+
+        posted_date = self.__get_text(div.find('div', class_='field-date'))
+        author = self.__get_text(div.find('div', class_='field-author'))
+        links = div.find('div', class_='links')
+        anchors = links.find_all('a') if links else []
+        story_by_language = {
+            self.__get_text(anchor).lower(): self.__absolute_url(anchor['href'])
+            for anchor in anchors
+        }
+        return dict(
+            title=title,
+            posted_date=posted_date,
+            author=author,
+            supported_languages=story_by_language,
+        )
+
+    def _crawl_pagination_stories(self, pagination):
+        url = pagination['url']
+        page = self._html.get(url)
+        content_views = page.find_all('div', class_='view-content')
+        stories = []
+        for content in content_views:
+            stories.extend([story for story in map(self._to_story, content.find_all('div', class_='views-row')) if story])
+        return stories
+
     def _crawl_story_hierarchy(self, hierarchy):
         stories_url = hierarchy['stories_url']
         paginations = self._crawl_pagination(stories_url)
@@ -141,15 +178,19 @@ class NalibaliChef(JsonTreeChef):
                 page=0,
                 name='1',
             ))
-        return stories_url, paginations
+        all_stories_by_bucket = list(map(self._crawl_pagination_stories, paginations))
+        stories_by_language = {}
+        for stories_bucket in all_stories_by_bucket:
+            for story in stories_bucket:
+                for lang, url in story['supported_languages'].items():
+                    stories = stories_by_language.get(lang)
+                    if not stories:
+                        stories = []
+                        stories_by_language[lang] = stories
+                    stories.append(url)
+        return stories_url, stories_by_language
 
     # Crawling
-    # For every story hierarchy:
-    #   Starting at the root page
-    #     For every page:
-    #       For every story:
-    #         For every language the story is in:
-    #           Keep language->[story URL]
     def crawl(self, args, options):
         root_page = self._html.get(NalibaliChef.ROOT_URL)
         story_hierarchies = self._crawl_story_hierarchies(root_page)
