@@ -166,7 +166,7 @@ class NalibaliChef(JsonTreeChef):
                 posted_date=posted_date,
                 author=author,
                 language=self.__get_text(anchor),
-                href=self.__absolute_url(anchor['href']),
+                url=self.__absolute_url(anchor['href']),
             )
             for anchor in anchors
         }
@@ -254,33 +254,21 @@ class NalibaliChef(JsonTreeChef):
 
         # TODO: Set the values for source_id, description,
         for i, (language, stories) in enumerate(items):
-            language_code = getlang_by_native_name(language).code
-            language_node = dict(
-                kind=content_kinds.HTML5,
-                source_id=language,
-                title=language,
-                language=language_code,
-                description='',
-                license=NalibaliChef.LICENSE,
-                files=[],
-            )
-            zip_path = self._scrape_multilingual_stories(stories)
-            language_node['files'].append(dict(
-                file_type=content_kinds.HTML5,
-                path=zip_path,
-                language=language_code,
-            ))
+            stories_nodes = list(map(self._scrape_multilingual_story, stories))
             topic_node = dict(
                 kind=content_kinds.TOPIC,
                 source_id='topic' + language,
                 title=language,
                 description=f'Stories for language {language}',
-                children=[language_node]
+                children=[stories_nodes]
             )
             stories_hierarchy_by_language[i] = topic_node
         return stories_hierarchy_by_language
 
-    def _scrape_multilingual_stories(self, stories):
+    def _scrape_multilingual_story(self, story):
+        page = self._html.get(story['url'])
+        story_section = page.find('section', id='section-main')
+        language_code = getlang_by_native_name(story['language']).code
         dest_path = tempfile.mkdtemp(dir=NalibaliChef.ZIP_FILES_TMP_DIR)
         basic_page_str = """
         <!DOCTYPE html>
@@ -294,20 +282,25 @@ class NalibaliChef(JsonTreeChef):
         </html>"""
         basic_page = BeautifulSoup(basic_page_str, "html.parser")
         body = basic_page.find('body')
-        nav = basic_page.new_tag('nav')
-        ul = basic_page.new_tag('ul')
-        for story in stories:
-            li = basic_page.new_tag('li')
-            anchor = basic_page.new_tag('a', href='#')
-            anchor.string = story['title']
-            li.append(anchor)
-            ul.append(li)
-        nav.append(ul)
-        body.append(nav)
+        body.append(story_section)
         with open(os.path.join(dest_path, 'index.html'), 'w', encoding="utf8") as index_html:
             index_html.write(str(basic_page))
         zip_path = create_predictable_zip(dest_path)
-        return zip_path
+        return dict(
+            kind=content_kinds.HTML5,
+            # TODO: Drop the hostname
+            source_id=story['url'],
+            title=story['title'],
+            language=language_code,
+            # TODO: Scrape the description
+            description='',
+            license=NalibaliChef.LICENSE,
+            files=[dict(
+                file_type=content_kinds.HTML5,
+                path=zip_path,
+                language=language_code,
+            )],
+        )
 
     def pre_run(self, args, options):
         self.crawl(args, options)
