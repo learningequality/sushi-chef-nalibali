@@ -66,6 +66,7 @@ class NalibaliChef(JsonTreeChef):
 
     # Matching regexes
     STORY_PAGE_LINK_RE = compile(r'^.+page=(?P<page>\d+)$')
+    SUPPORTED_THUMBNAIL_EXTENSIONS = compile(r'\.(png|jpg|jpeg)')
 
     def __init__(self, html, logger):
         super(NalibaliChef, self).__init__(None, None)
@@ -159,6 +160,9 @@ class NalibaliChef(JsonTreeChef):
         author = self.__get_text(div.find('div', class_='field-author'))
         links = div.find('div', class_='links')
         anchors = links.find_all('a') if links else []
+        image = div.find('img', class_='img-responsive') or div.find('img')
+        image_src = image['src'] if image else ''
+        thumbnail = image_src.split('?')[0] if NalibaliChef.SUPPORTED_THUMBNAIL_EXTENSIONS.search(image_src) else None
         story_by_language = {
             self.__get_text(anchor): dict(
                 kind='NalibaliLocalizedStory',
@@ -167,6 +171,7 @@ class NalibaliChef(JsonTreeChef):
                 author=author,
                 language=self.__get_text(anchor),
                 url=self.__absolute_url(anchor['href']),
+                thumbnail_url=thumbnail,
             )
             for anchor in anchors
         }
@@ -303,6 +308,7 @@ class NalibaliChef(JsonTreeChef):
             # TODO: Scrape the description
             description='',
             license=NalibaliChef.LICENSE,
+            thumbnail=story['thumbnail_url'],
             files=[dict(
                 file_type=content_kinds.HTML5,
                 path=zip_path,
