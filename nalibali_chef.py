@@ -275,6 +275,7 @@ class NalibaliChef(JsonTreeChef):
     def _scrape_multilingual_story(self, story):
         page = self._html.get(story['url'])
         story_section = page.find('section', id='section-main')
+        title = self.__get_text(story_section.find('h1', class_='page-header'))
         language_code = getlang_by_native_name(story['language']).code
         dest_path = tempfile.mkdtemp(dir=NalibaliChef.ZIP_FILES_TMP_DIR)
         basic_page_str = """
@@ -297,7 +298,7 @@ class NalibaliChef(JsonTreeChef):
             kind=content_kinds.HTML5,
             # TODO: Drop the hostname
             source_id=story['url'],
-            title=story['title'],
+            title=title,
             language=language_code,
             # TODO: Scrape the description
             description='',
