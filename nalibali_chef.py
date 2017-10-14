@@ -16,6 +16,8 @@ from ricecooker.utils.caching import CacheForeverHeuristic, FileCache, CacheCont
 from ricecooker.utils.html import download_file
 from ricecooker.utils.jsontrees import write_tree_to_json_tree
 from ricecooker.utils.zip import create_predictable_zip
+from ricecooker.classes.nodes import HTML5AppNode
+from ricecooker.classes import files
 
 # Logging settings
 def create_logger():
@@ -60,11 +62,13 @@ class NalibaliChef(JsonTreeChef):
     CRAWLING_STAGE_OUTPUT = 'web_resource_tree.json'
     SCRAPING_STAGE_OUTPUT = 'ricecooker_json_tree.json'
     ZIP_FILES_TMP_DIR = os.path.join(DATA_DIR, 'zipfiles')
+    LICENSE = get_license(licenses.CC_BY_NC_ND, copyright_holder="Nal'ibali").as_dict()
 
     # Matching regexes
     STORY_PAGE_LINK_RE = compile(r'^.+page=(?P<page>\d+)$')
 
     def __init__(self, html, logger):
+        super(NalibaliChef, self).__init__(None, None)
         self._html = html
         self._logger = logger
 
@@ -209,8 +213,8 @@ class NalibaliChef(JsonTreeChef):
         root_page = self._html.get(NalibaliChef.ROOT_URL)
         story_hierarchies = self._crawl_story_hierarchies(root_page)
         web_resource_tree = dict(
-            kind="NalibaliWebResourceTree",
-            title="Nalibali Web Resource Tree",
+            kind='NalibaliWebResourceTree',
+            title="Nal'ibali Web Resource Tree",
             language='en',
             children=story_hierarchies,
         )
@@ -236,7 +240,7 @@ class NalibaliChef(JsonTreeChef):
             title=web_resource_tree['title'],
             description='',
             language='en',
-            thumbnail='',
+            thumbnail='./content/nalibali_logo.png',
             children=[],
         )
         ricecooker_json_tree['children'] = self._scrape_multilingual_stories_hierarchy(web_resource_tree['children'][0])
@@ -250,20 +254,30 @@ class NalibaliChef(JsonTreeChef):
 
         # TODO: Set the values for source_id, description,
         for i, (language, stories) in enumerate(items):
+            language_code = getlang_by_native_name(language).code
             language_node = dict(
                 kind=content_kinds.HTML5,
                 source_id=language,
                 title=language,
-                language=getlang_by_native_name(language).code,
+                language=language_code,
                 description='',
+                license=NalibaliChef.LICENSE,
+                files=[],
             )
             zip_path = self._scrape_multilingual_stories(stories)
-            html_zip_file = dict(
-                file_type='HTMLZipFile',
+            language_node['files'].append(dict(
+                file_type=content_kinds.HTML5,
                 path=zip_path,
+                language=language_code,
+            ))
+            topic_node = dict(
+                kind=content_kinds.TOPIC,
+                source_id='topic' + language,
+                title=language,
+                description=f'Stories for language {language}',
+                children=[language_node]
             )
-            language_node['files'] = [html_zip_file]
-            stories_hierarchy_by_language[i] = language_node
+            stories_hierarchy_by_language[i] = topic_node
         return stories_hierarchy_by_language
 
     def _scrape_multilingual_stories(self, stories):
@@ -308,4 +322,5 @@ def __get_testing_chef():
 if __name__ == '__main__':
     http_session = create_http_session(NalibaliChef.HOSTNAME)
     logger = create_logger()
-    NalibaliChef(Html(http_session, logger), logger).main()
+    chef = NalibaliChef(Html(http_session, logger), logger)
+    chef.main()

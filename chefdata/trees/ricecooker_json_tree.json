@@ -1,151 +1,305 @@
 {
   "source_domain": "nalibali.org",
   "source_id": "nalibali",
-  "title": "Nalibali Web Resource Tree",
+  "title": "Nal'ibali Web Resource Tree",
   "description": "",
   "language": "en",
-  "thumbnail": "",
+  "thumbnail": "./content/nalibali_logo.png",
   "children": [
     {
-      "kind": "html5",
-      "source_id": "English",
+      "kind": "topic",
+      "source_id": "topicEnglish",
       "title": "English",
-      "language": "en",
-      "description": "",
-      "files": [
+      "description": "Stories for language English",
+      "children": [
         {
-          "file_type": "HTMLZipFile",
-          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmp72giki4c.zip"
+          "kind": "html5",
+          "source_id": "English",
+          "title": "English",
+          "language": "en",
+          "description": "",
+          "license": {
+            "license_id": "CC BY-NC-ND",
+            "copyright_holder": "Nal'ibali",
+            "description": null
+          },
+          "files": [
+            {
+              "file_type": "html5",
+              "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmpol3jig6w.zip",
+              "language": "en"
+            }
+          ]
         }
       ]
     },
     {
-      "kind": "html5",
-      "source_id": "Afrikaans",
+      "kind": "topic",
+      "source_id": "topicAfrikaans",
       "title": "Afrikaans",
-      "language": "af",
-      "description": "",
-      "files": [
+      "description": "Stories for language Afrikaans",
+      "children": [
         {
-          "file_type": "HTMLZipFile",
-          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmpamu_039s.zip"
+          "kind": "html5",
+          "source_id": "Afrikaans",
+          "title": "Afrikaans",
+          "language": "af",
+          "description": "",
+          "license": {
+            "license_id": "CC BY-NC-ND",
+            "copyright_holder": "Nal'ibali",
+            "description": null
+          },
+          "files": [
+            {
+              "file_type": "html5",
+              "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmpdt7cahsq.zip",
+              "language": "af"
+            }
+          ]
         }
       ]
     },
     {
-      "kind": "html5",
-      "source_id": "isiXhosa",
+      "kind": "topic",
+      "source_id": "topicisiXhosa",
       "title": "isiXhosa",
-      "language": "xho",
-      "description": "",
-      "files": [
+      "description": "Stories for language isiXhosa",
+      "children": [
         {
-          "file_type": "HTMLZipFile",
-          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmpvkh2njo3.zip"
+          "kind": "html5",
+          "source_id": "isiXhosa",
+          "title": "isiXhosa",
+          "language": "xho",
+          "description": "",
+          "license": {
+            "license_id": "CC BY-NC-ND",
+            "copyright_holder": "Nal'ibali",
+            "description": null
+          },
+          "files": [
+            {
+              "file_type": "html5",
+              "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmplecp70p5.zip",
+              "language": "xho"
+            }
+          ]
         }
       ]
     },
     {
-      "kind": "html5",
-      "source_id": "isiZulu",
+      "kind": "topic",
+      "source_id": "topicisiZulu",
       "title": "isiZulu",
-      "language": "zul",
-      "description": "",
-      "files": [
+      "description": "Stories for language isiZulu",
+      "children": [
         {
-          "file_type": "HTMLZipFile",
-          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmp_v_26jw4.zip"
+          "kind": "html5",
+          "source_id": "isiZulu",
+          "title": "isiZulu",
+          "language": "zul",
+          "description": "",
+          "license": {
+            "license_id": "CC BY-NC-ND",
+            "copyright_holder": "Nal'ibali",
+            "description": null
+          },
+          "files": [
+            {
+              "file_type": "html5",
+              "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmpp2ru5u4m.zip",
+              "language": "zul"
+            }
+          ]
         }
       ]
     },
     {
-      "kind": "html5",
-      "source_id": "Sesotho",
+      "kind": "topic",
+      "source_id": "topicSesotho",
       "title": "Sesotho",
-      "language": "sot",
-      "description": "",
-      "files": [
+      "description": "Stories for language Sesotho",
+      "children": [
         {
-          "file_type": "HTMLZipFile",
-          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmphfbixxpm.zip"
+          "kind": "html5",
+          "source_id": "Sesotho",
+          "title": "Sesotho",
+          "language": "sot",
+          "description": "",
+          "license": {
+            "license_id": "CC BY-NC-ND",
+            "copyright_holder": "Nal'ibali",
+            "description": null
+          },
+          "files": [
+            {
+              "file_type": "html5",
+              "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmpi5yn6yba.zip",
+              "language": "sot"
+            }
+          ]
         }
       ]
     },
     {
-      "kind": "html5",
-      "source_id": "Sepedi",
+      "kind": "topic",
+      "source_id": "topicSepedi",
       "title": "Sepedi",
-      "language": "nso",
-      "description": "",
-      "files": [
+      "description": "Stories for language Sepedi",
+      "children": [
         {
-          "file_type": "HTMLZipFile",
-          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmpopek0lfp.zip"
+          "kind": "html5",
+          "source_id": "Sepedi",
+          "title": "Sepedi",
+          "language": "nso",
+          "description": "",
+          "license": {
+            "license_id": "CC BY-NC-ND",
+            "copyright_holder": "Nal'ibali",
+            "description": null
+          },
+          "files": [
+            {
+              "file_type": "html5",
+              "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmpn7gmhsr0.zip",
+              "language": "nso"
+            }
+          ]
         }
       ]
     },
     {
-      "kind": "html5",
-      "source_id": "Tshivenda",
+      "kind": "topic",
+      "source_id": "topicTshivenda",
       "title": "Tshivenda",
-      "language": "ve",
-      "description": "",
-      "files": [
+      "description": "Stories for language Tshivenda",
+      "children": [
         {
-          "file_type": "HTMLZipFile",
-          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmpgdctbpyd.zip"
+          "kind": "html5",
+          "source_id": "Tshivenda",
+          "title": "Tshivenda",
+          "language": "ve",
+          "description": "",
+          "license": {
+            "license_id": "CC BY-NC-ND",
+            "copyright_holder": "Nal'ibali",
+            "description": null
+          },
+          "files": [
+            {
+              "file_type": "html5",
+              "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmpzp0ty3xz.zip",
+              "language": "ve"
+            }
+          ]
         }
       ]
     },
     {
-      "kind": "html5",
-      "source_id": "isiNdebele",
+      "kind": "topic",
+      "source_id": "topicisiNdebele",
       "title": "isiNdebele",
-      "language": "nr",
-      "description": "",
-      "files": [
+      "description": "Stories for language isiNdebele",
+      "children": [
         {
-          "file_type": "HTMLZipFile",
-          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmpnbp0t273.zip"
+          "kind": "html5",
+          "source_id": "isiNdebele",
+          "title": "isiNdebele",
+          "language": "nr",
+          "description": "",
+          "license": {
+            "license_id": "CC BY-NC-ND",
+            "copyright_holder": "Nal'ibali",
+            "description": null
+          },
+          "files": [
+            {
+              "file_type": "html5",
+              "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmp2mknblco.zip",
+              "language": "nr"
+            }
+          ]
         }
       ]
     },
     {
-      "kind": "html5",
-      "source_id": "Setswana",
+      "kind": "topic",
+      "source_id": "topicSetswana",
       "title": "Setswana",
-      "language": "tsn",
-      "description": "",
-      "files": [
+      "description": "Stories for language Setswana",
+      "children": [
         {
-          "file_type": "HTMLZipFile",
-          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmp_nxean3t.zip"
+          "kind": "html5",
+          "source_id": "Setswana",
+          "title": "Setswana",
+          "language": "tsn",
+          "description": "",
+          "license": {
+            "license_id": "CC BY-NC-ND",
+            "copyright_holder": "Nal'ibali",
+            "description": null
+          },
+          "files": [
+            {
+              "file_type": "html5",
+              "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmpvmxwy5x7.zip",
+              "language": "tsn"
+            }
+          ]
         }
       ]
     },
     {
-      "kind": "html5",
-      "source_id": "Siswati",
+      "kind": "topic",
+      "source_id": "topicSiswati",
       "title": "Siswati",
-      "language": "ss",
-      "description": "",
-      "files": [
+      "description": "Stories for language Siswati",
+      "children": [
         {
-          "file_type": "HTMLZipFile",
-          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmptqjt8axq.zip"
+          "kind": "html5",
+          "source_id": "Siswati",
+          "title": "Siswati",
+          "language": "ss",
+          "description": "",
+          "license": {
+            "license_id": "CC BY-NC-ND",
+            "copyright_holder": "Nal'ibali",
+            "description": null
+          },
+          "files": [
+            {
+              "file_type": "html5",
+              "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmpc2r2_nw3.zip",
+              "language": "ss"
+            }
+          ]
         }
       ]
     },
     {
-      "kind": "html5",
-      "source_id": "Xitsonga",
+      "kind": "topic",
+      "source_id": "topicXitsonga",
       "title": "Xitsonga",
-      "language": "ts",
-      "description": "",
-      "files": [
+      "description": "Stories for language Xitsonga",
+      "children": [
         {
-          "file_type": "HTMLZipFile",
-          "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmp2kykxtb5.zip"
+          "kind": "html5",
+          "source_id": "Xitsonga",
+          "title": "Xitsonga",
+          "language": "ts",
+          "description": "",
+          "license": {
+            "license_id": "CC BY-NC-ND",
+            "copyright_holder": "Nal'ibali",
+            "description": null
+          },
+          "files": [
+            {
+              "file_type": "html5",
+              "path": "/var/folders/4n/8vhcf9yx6l56tjfz6t9k82xm0000gn/T/tmpta0t5wij.zip",
+              "language": "ts"
+            }
+          ]
         }
       ]
     }
