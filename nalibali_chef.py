@@ -200,12 +200,18 @@ class NalibaliChef(JsonTreeChef):
         stories_by_language = {}
         for stories_bucket in all_stories_by_bucket:
             for story in stories_bucket:
-                for lang, url in story['supported_languages'].items():
-                    stories = stories_by_language.get(lang)
-                    if not stories:
-                        stories = []
-                        stories_by_language[lang] = stories
-                    stories.append(url)
+                for lang, story in story['supported_languages'].items():
+                    by_language = stories_by_language.get(lang)
+                    if not by_language:
+                        by_language = (set(), [])
+                        stories_by_language[lang] = by_language
+                    uniques, stories = by_language
+                    url = story['url']
+                    if url not in uniques:
+                        stories.append(story)
+                    uniques.add(url)
+        for lang, (uniques, stories) in stories_by_language.items():
+            stories_by_language[lang] = stories
         return stories_url, stories_by_language
 
     # Crawling
@@ -238,6 +244,7 @@ class NalibaliChef(JsonTreeChef):
             source_domain=NalibaliChef.HOSTNAME,
             source_id='nalibali',
             title=web_resource_tree['title'],
+            # TODO
             description='',
             language='en',
             thumbnail='./content/nalibali_logo.png',
@@ -259,8 +266,8 @@ class NalibaliChef(JsonTreeChef):
                 kind=content_kinds.TOPIC,
                 source_id='topic' + language,
                 title=language,
-                description=f'Stories for language {language}',
-                children=[stories_nodes]
+                description=f'Stories in {language}',
+                children=stories_nodes,
             )
             stories_hierarchy_by_language[i] = topic_node
         return stories_hierarchy_by_language
