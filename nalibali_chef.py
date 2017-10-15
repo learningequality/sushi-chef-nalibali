@@ -7,6 +7,9 @@ import json
 from re import compile
 from bs4 import BeautifulSoup
 import tempfile
+import shutil
+import pathlib
+from urllib.parse import urlparse
 
 from le_utils.constants import content_kinds, licenses
 from le_utils.constants.languages import getlang_by_native_name
@@ -50,6 +53,9 @@ class Html:
         elif not response.from_cache:
             self._logger.debug("NOT CACHED:", url)
         return BeautifulSoup(response.content, "html.parser")
+
+    def get_image(self, url):
+        return self._http_session.get(url, stream=True)
 
 # Chef
 class NalibaliChef(JsonTreeChef):
@@ -277,12 +283,47 @@ class NalibaliChef(JsonTreeChef):
             stories_hierarchy_by_language[i] = topic_node
         return stories_hierarchy_by_language
 
+    def _scrape_download_image(self, base_path, img):
+        url = img['src']
+
+        if not url:
+            return
+
+        if url.startswith('http') or url.startswith('https'):
+            absolute_url = url
+            parsed_url = urlparse(url)
+            relative_url = parsed_url.path
+        else:
+            absolute_url = self.__absolute_url(url)
+            relative_url = url
+
+        self._scrape_download_image_helper(base_path, img, absolute_url, relative_url)
+
+    def _scrape_download_image_helper(self, base_path, img, absolute_url, relative_url):
+        image_response = self._html.get_image(absolute_url)
+        if image_response.status_code != 200:
+            return
+        filename = os.path.basename(relative_url)
+        subdirs = os.path.dirname(relative_url).split('/')
+        relative_file_base_path = os.path.join(*subdirs)
+        image_dir = os.path.join(base_path, relative_file_base_path)
+        pathlib.Path(image_dir).mkdir(parents=True, exist_ok=True)
+        image_path = os.path.join(image_dir, filename)
+        with open(image_path, 'wb') as f:
+            image_response.raw.decode_content = True
+            shutil.copyfileobj(image_response.raw, f)
+        img['src'] = os.path.join(relative_file_base_path, filename)
+
     def _scrape_multilingual_story(self, story):
         page = self._html.get(story['url'])
         story_section = page.find('section', id='section-main')
         title = self.__get_text(story_section.find('h1', class_='page-header'))
         language_code = getlang_by_native_name(story['language']).code
         dest_path = tempfile.mkdtemp(dir=NalibaliChef.ZIP_FILES_TMP_DIR)
+
+        for img in story_section.find_all('img'):
+            self._scrape_download_image(dest_path, img)
+
         basic_page_str = """
         <!DOCTYPE html>
         <html>
