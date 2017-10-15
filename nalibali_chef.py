@@ -305,18 +305,23 @@ class NalibaliChef(JsonTreeChef):
             return
         filename = os.path.basename(relative_url)
         subdirs = os.path.dirname(relative_url).split('/')
-        relative_file_base_path = os.path.join(*subdirs)
-        image_dir = os.path.join(base_path, relative_file_base_path)
+        image_dir = os.path.join(base_path, *subdirs)
         pathlib.Path(image_dir).mkdir(parents=True, exist_ok=True)
         image_path = os.path.join(image_dir, filename)
         with open(image_path, 'wb') as f:
             image_response.raw.decode_content = True
             shutil.copyfileobj(image_response.raw, f)
-        img['src'] = os.path.join(relative_file_base_path, filename)
+        img['src'] = relative_url[1:] if relative_url[0] == '/' else relative_url
 
     def _scrape_multilingual_story(self, story):
         page = self._html.get(story['url'])
         story_section = page.find('section', id='section-main')
+        links_section = story_section.find('div', class_='languages-links')
+
+        # Is there a way to cross link HTML5AppNode?
+        if links_section:
+            links_section.extract()
+
         title = self.__get_text(story_section.find('h1', class_='page-header'))
         language_code = getlang_by_native_name(story['language']).code
         dest_path = tempfile.mkdtemp(dir=NalibaliChef.ZIP_FILES_TMP_DIR)
