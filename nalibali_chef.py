@@ -7,6 +7,9 @@ import json
 from re import compile
 from bs4 import BeautifulSoup
 import tempfile
+import shutil
+import pathlib
+from urllib.parse import urlparse
 
 from le_utils.constants import content_kinds, licenses
 from le_utils.constants.languages import getlang_by_native_name
@@ -51,6 +54,9 @@ class Html:
             self._logger.debug("NOT CACHED:", url)
         return BeautifulSoup(response.content, "html.parser")
 
+    def get_image(self, url):
+        return self._http_session.get(url, stream=True)
+
 # Chef
 class NalibaliChef(JsonTreeChef):
 
@@ -66,6 +72,7 @@ class NalibaliChef(JsonTreeChef):
 
     # Matching regexes
     STORY_PAGE_LINK_RE = compile(r'^.+page=(?P<page>\d+)$')
+    SUPPORTED_THUMBNAIL_EXTENSIONS = compile(r'\.(png|jpg|jpeg)')
 
     def __init__(self, html, logger):
         super(NalibaliChef, self).__init__(None, None)
@@ -159,6 +166,9 @@ class NalibaliChef(JsonTreeChef):
         author = self.__get_text(div.find('div', class_='field-author'))
         links = div.find('div', class_='links')
         anchors = links.find_all('a') if links else []
+        image = div.find('img', class_='img-responsive') or div.find('img')
+        image_src = image['src'] if image else ''
+        thumbnail = image_src.split('?')[0] if NalibaliChef.SUPPORTED_THUMBNAIL_EXTENSIONS.search(image_src) else None
         story_by_language = {
             self.__get_text(anchor): dict(
                 kind='NalibaliLocalizedStory',
@@ -167,6 +177,7 @@ class NalibaliChef(JsonTreeChef):
                 author=author,
                 language=self.__get_text(anchor),
                 url=self.__absolute_url(anchor['href']),
+                thumbnail_url=thumbnail,
             )
             for anchor in anchors
         }
@@ -200,12 +211,18 @@ class NalibaliChef(JsonTreeChef):
         stories_by_language = {}
         for stories_bucket in all_stories_by_bucket:
             for story in stories_bucket:
-                for lang, url in story['supported_languages'].items():
-                    stories = stories_by_language.get(lang)
-                    if not stories:
-                        stories = []
-                        stories_by_language[lang] = stories
-                    stories.append(url)
+                for lang, story in story['supported_languages'].items():
+                    by_language = stories_by_language.get(lang)
+                    if not by_language:
+                        by_language = (set(), [])
+                        stories_by_language[lang] = by_language
+                    uniques, stories = by_language
+                    url = story['url']
+                    if url not in uniques:
+                        stories.append(story)
+                    uniques.add(url)
+        for lang, (uniques, stories) in stories_by_language.items():
+            stories_by_language[lang] = stories
         return stories_url, stories_by_language
 
     # Crawling
@@ -238,6 +255,7 @@ class NalibaliChef(JsonTreeChef):
             source_domain=NalibaliChef.HOSTNAME,
             source_id='nalibali',
             title=web_resource_tree['title'],
+            # TODO
             description='',
             language='en',
             thumbnail='./content/nalibali_logo.png',
@@ -259,17 +277,58 @@ class NalibaliChef(JsonTreeChef):
                 kind=content_kinds.TOPIC,
                 source_id='topic' + language,
                 title=language,
-                description=f'Stories for language {language}',
-                children=[stories_nodes]
+                description=f'Stories in {language}',
+                children=stories_nodes,
             )
             stories_hierarchy_by_language[i] = topic_node
         return stories_hierarchy_by_language
 
+    def _scrape_download_image(self, base_path, img):
+        url = img['src']
+
+        if not url:
+            return
+
+        if url.startswith('http') or url.startswith('https'):
+            absolute_url = url
+            parsed_url = urlparse(url)
+            relative_url = parsed_url.path
+        else:
+            absolute_url = self.__absolute_url(url)
+            relative_url = url
+
+        self._scrape_download_image_helper(base_path, img, absolute_url, relative_url)
+
+    def _scrape_download_image_helper(self, base_path, img, absolute_url, relative_url):
+        image_response = self._html.get_image(absolute_url)
+        if image_response.status_code != 200:
+            return
+        filename = os.path.basename(relative_url)
+        subdirs = os.path.dirname(relative_url).split('/')
+        image_dir = os.path.join(base_path, *subdirs)
+        pathlib.Path(image_dir).mkdir(parents=True, exist_ok=True)
+        image_path = os.path.join(image_dir, filename)
+        with open(image_path, 'wb') as f:
+            image_response.raw.decode_content = True
+            shutil.copyfileobj(image_response.raw, f)
+        img['src'] = relative_url[1:] if relative_url[0] == '/' else relative_url
+
     def _scrape_multilingual_story(self, story):
         page = self._html.get(story['url'])
         story_section = page.find('section', id='section-main')
+        links_section = story_section.find('div', class_='languages-links')
+
+        # Is there a way to cross link HTML5AppNode?
+        if links_section:
+            links_section.extract()
+
+        title = self.__get_text(story_section.find('h1', class_='page-header'))
         language_code = getlang_by_native_name(story['language']).code
         dest_path = tempfile.mkdtemp(dir=NalibaliChef.ZIP_FILES_TMP_DIR)
+
+        for img in story_section.find_all('img'):
+            self._scrape_download_image(dest_path, img)
+
         basic_page_str = """
         <!DOCTYPE html>
         <html>
@@ -290,11 +349,12 @@ class NalibaliChef(JsonTreeChef):
             kind=content_kinds.HTML5,
             # TODO: Drop the hostname
             source_id=story['url'],
-            title=story['title'],
+            title=title,
             language=language_code,
             # TODO: Scrape the description
             description='',
             license=NalibaliChef.LICENSE,
+            thumbnail=story['thumbnail_url'],
             files=[dict(
                 file_type=content_kinds.HTML5,
                 path=zip_path,
