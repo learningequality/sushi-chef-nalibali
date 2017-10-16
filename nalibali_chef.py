@@ -253,12 +253,11 @@ class NalibaliChef(JsonTreeChef):
 
         ricecooker_json_tree = dict(
             source_domain=NalibaliChef.HOSTNAME,
-            source_id='nalibali',
+            source_id="nal'ibali",
             title=web_resource_tree['title'],
-            # TODO
-            description='',
+            description="""Nal'ibali (isiXhosa for "here's the story") is a national reading-for-enjoyment campaign to spark children's potential through storytelling and reading.""",
             language='en',
-            thumbnail='./content/nalibali_logo.png',
+            thumbnail='http://nalibali.org/sites/default/files/nalibali_logo.png',
             children=[],
         )
         ricecooker_json_tree['children'] = self._scrape_multilingual_stories_hierarchy(web_resource_tree['children'][0])
@@ -269,13 +268,11 @@ class NalibaliChef(JsonTreeChef):
         assert stories_hierarchy['kind'] == 'NalibaliMultilingualStoriesHierarchy'
         items = stories_hierarchy['children'].items()
         stories_hierarchy_by_language = [None] * len(items)
-
-        # TODO: Set the values for source_id, description,
         for i, (language, stories) in enumerate(items):
             stories_nodes = list(map(self._scrape_multilingual_story, stories))
             topic_node = dict(
                 kind=content_kinds.TOPIC,
-                source_id='topic' + language,
+                source_id=f'multilingual_stories_{language}',
                 title=language,
                 description=f'Stories in {language}',
                 children=stories_nodes,
@@ -314,7 +311,8 @@ class NalibaliChef(JsonTreeChef):
         img['src'] = relative_url[1:] if relative_url[0] == '/' else relative_url
 
     def _scrape_multilingual_story(self, story):
-        page = self._html.get(story['url'])
+        url = story['url']
+        page = self._html.get(url)
         story_section = page.find('section', id='section-main')
         links_section = story_section.find('div', class_='languages-links')
 
@@ -345,13 +343,12 @@ class NalibaliChef(JsonTreeChef):
         with open(os.path.join(dest_path, 'index.html'), 'w', encoding="utf8") as index_html:
             index_html.write(str(basic_page))
         zip_path = create_predictable_zip(dest_path)
+        parsed_story_url = urlparse(url)
         return dict(
             kind=content_kinds.HTML5,
-            # TODO: Drop the hostname
-            source_id=story['url'],
+            source_id=parsed_story_url.path if parsed_story_url else url,
             title=title,
             language=language_code,
-            # TODO: Scrape the description
             description='',
             license=NalibaliChef.LICENSE,
             thumbnail=story['thumbnail_url'],
