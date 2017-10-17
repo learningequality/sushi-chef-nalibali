@@ -4,6 +4,7 @@ import os
 import logging
 import requests
 import json
+from re import I as IgnoreCase
 from re import compile
 from bs4 import BeautifulSoup
 import tempfile
@@ -73,6 +74,7 @@ class NalibaliChef(JsonTreeChef):
     # Matching regexes
     STORY_PAGE_LINK_RE = compile(r'^.+page=(?P<page>\d+)$')
     SUPPORTED_THUMBNAIL_EXTENSIONS = compile(r'\.(png|jpg|jpeg)')
+    AUTHOR_RE = compile(r'author:', IgnoreCase)
 
     def __init__(self, html, logger):
         super(NalibaliChef, self).__init__(None, None)
@@ -90,29 +92,34 @@ class NalibaliChef(JsonTreeChef):
     def __get_text(self, elem):
         return "" if elem is None else elem.get_text().replace('\r', '').replace('\n', ' ').strip()
 
+    def __sanitize_author(self, text):
+        if not text:
+            return text
+        new_text, _ = NalibaliChef.AUTHOR_RE.subn('', text)
+        return new_text.strip()
+
     def __to_story_hierarchy(self, div):
         title = self.__get_text(div.find('h2'))
         image_url = div.find('img', class_='img-responsive')['src']
         body_text = self.__get_text(div.find('div', class_='body'))
         stories_url = self.__absolute_url(div.find('div', class_='views-field').find('a', class_='btn link')['href'])
         return dict(
-            kind='NalibaliMultilingualStoriesHierarchy',
+            kind='NalibaliHierarchy',
             title=title,
-            image_url=image_url,
-            body_text=body_text,
-            stories_url=stories_url,
+            thumbnail=image_url,
+            description=body_text,
+            url=stories_url,
         )
 
     def _crawl_story_hierarchies(self, page):
         content_div = page.find('div', class_='region-content')
         vocabulary_div = content_div.find('div', class_='view-vocabulary')
         stories_divs = vocabulary_div.find_all('div', 'views-row')
-        story_hierarchies  = [h for h in map(self.__to_story_hierarchy, stories_divs) if h['title'] == "Multilingual stories"]
+        story_hierarchies = [h for h in map(self.__to_story_hierarchy, stories_divs)]
         stories_dict = dict(map(self._crawl_story_hierarchy, story_hierarchies))
         for h in story_hierarchies:
-            stories = stories_dict.get(h['stories_url'])
-            if stories:
-                h['children'] = stories
+            stories = stories_dict.get(h['url'], {})
+            h['children'] = stories
         return story_hierarchies
 
     def _to_pagination(self, anchor):
@@ -163,7 +170,7 @@ class NalibaliChef(JsonTreeChef):
             return None
 
         posted_date = self.__get_text(div.find('div', class_='field-date'))
-        author = self.__get_text(div.find('div', class_='field-author'))
+        author = self.__sanitize_author(self.__get_text(div.find('div', class_='field-author')))
         links = div.find('div', class_='links')
         anchors = links.find_all('a') if links else []
         image = div.find('img', class_='img-responsive') or div.find('img')
@@ -177,7 +184,7 @@ class NalibaliChef(JsonTreeChef):
                 author=author,
                 language=self.__get_text(anchor),
                 url=self.__absolute_url(anchor['href']),
-                thumbnail_url=thumbnail,
+                thumbnail=thumbnail,
             )
             for anchor in anchors
         }
@@ -199,7 +206,7 @@ class NalibaliChef(JsonTreeChef):
         return stories
 
     def _crawl_story_hierarchy(self, hierarchy):
-        stories_url = hierarchy['stories_url']
+        stories_url = hierarchy['url']
         paginations = self._crawl_pagination(stories_url)
         paginations.insert(0, dict(
                 kind='NalibaliPagination',
@@ -260,25 +267,42 @@ class NalibaliChef(JsonTreeChef):
             thumbnail='http://nalibali.org/sites/default/files/nalibali_logo.png',
             children=[],
         )
-        ricecooker_json_tree['children'] = self._scrape_multilingual_stories_hierarchy(web_resource_tree['children'][0])
+        hierarchies_map = { h['title']: h for h in web_resource_tree['children'] }
+        children = [None] * len(hierarchies_map.keys())
+        children[0] = self._scrape_hierarchy(hierarchies_map.get('Multilingual stories'), self._scrape_multilingual_story)
+        children[1] = self._scrape_hierarchy(hierarchies_map.get('Audio stories'), self._scrape_audio_story)
+        children[2] = self._scrape_hierarchy(hierarchies_map.get('Story cards'), self._scrape_story_card)
+        children[3] = self._scrape_hierarchy(hierarchies_map.get('Story seeds'), self._scrape_story_seed)
+        children[4] = self._scrape_hierarchy(hierarchies_map.get('Your stories'), self._scrape_your_story)
+        ricecooker_json_tree['children'] = children
         write_tree_to_json_tree(os.path.join(NalibaliChef.TREES_DATA_DIR, NalibaliChef.SCRAPING_STAGE_OUTPUT) , ricecooker_json_tree)
         return ricecooker_json_tree
 
-    def _scrape_multilingual_stories_hierarchy(self, stories_hierarchy):
-        assert stories_hierarchy['kind'] == 'NalibaliMultilingualStoriesHierarchy'
-        items = stories_hierarchy['children'].items()
-        stories_hierarchy_by_language = [None] * len(items)
+    def _scrape_hierarchy(self, hierarchy, story_scraping_func):
+        assert hierarchy['kind'] == 'NalibaliHierarchy'
+        items = hierarchy.get('children', {}).items()
+        hierarchy_name = hierarchy['title'].replace(' ', '_')
+        hierarchy_by_language = [None] * len(items)
         for i, (language, stories) in enumerate(items):
-            stories_nodes = list(map(self._scrape_multilingual_story, stories))
+            stories_nodes = [story for story in map(story_scraping_func, stories) if story]
             topic_node = dict(
                 kind=content_kinds.TOPIC,
-                source_id=f'multilingual_stories_{language}',
+                source_id=f'{hierarchy_name}_{language}',
                 title=language,
                 description=f'Stories in {language}',
                 children=stories_nodes,
             )
-            stories_hierarchy_by_language[i] = topic_node
-        return stories_hierarchy_by_language
+            hierarchy_by_language[i] = topic_node
+        hierarchy_title = hierarchy['title']
+        return dict(
+            kind=content_kinds.TOPIC,
+            source_id=hierarchy_title,
+            title=hierarchy_title,
+            description=hierarchy['description'],
+            children=hierarchy_by_language,
+            thumbnail=hierarchy['thumbnail'],
+        )
+
 
     def _scrape_download_image(self, base_path, img):
         url = img['src']
@@ -351,13 +375,25 @@ class NalibaliChef(JsonTreeChef):
             language=language_code,
             description='',
             license=NalibaliChef.LICENSE,
-            thumbnail=story['thumbnail_url'],
+            thumbnail=story['thumbnail'],
             files=[dict(
                 file_type=content_kinds.HTML5,
                 path=zip_path,
                 language=language_code,
             )],
         )
+
+    def _scrape_audio_story(self, story):
+        return None
+
+    def _scrape_story_card(self, story):
+        return None
+
+    def _scrape_story_seed(self, story):
+        return None
+
+    def _scrape_your_story(self, story):
+        return None
 
     def pre_run(self, args, options):
         self.crawl(args, options)
