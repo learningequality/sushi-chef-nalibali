@@ -387,7 +387,34 @@ class NalibaliChef(JsonTreeChef):
         return None
 
     def _scrape_story_card(self, story):
-        return None
+        url = story['url']
+        language_str = story['language']
+        language = getlang_by_native_name(language_str)
+        lang_code = None
+        if language:
+            lang_code = language.code
+        else:
+            print('Unknown language:', language_str)
+
+        if url and url.endswith('.pdf'):
+            parsed_url = urlparse(url)
+            return dict(
+                source_id=parsed_url.path,
+                kind=content_kinds.DOCUMENT,
+                title=story['title'],
+                # description=story['description'],
+                license=NalibaliChef.LICENSE,
+                author=story['author'],
+                thumbnail=story['thumbnail'],
+                language=lang_code,
+                files=[
+                    dict(
+                        file_type=content_kinds.DOCUMENT,
+                        path=url,
+                    )
+                ]
+            )
+        raise Exception('Non-PDF version not implemented')
 
     def _scrape_story_seed(self, story):
         return None
