@@ -13,7 +13,7 @@ import pathlib
 from urllib.parse import urlparse
 
 from le_utils.constants import content_kinds, licenses
-from le_utils.constants.languages import getlang_by_native_name
+from le_utils.constants.languages import getlang_by_native_name, getlang_by_name
 from ricecooker.chefs import JsonTreeChef
 from ricecooker.classes.licenses import get_license
 from ricecooker.utils.caching import CacheForeverHeuristic, FileCache, CacheControlAdapter, InvalidatingCacheControlAdapter
@@ -155,6 +155,17 @@ class NalibaliChef(JsonTreeChef):
             return actual_paginations
         return actual_paginations.extend(self._crawl_pagination(current_last['url']))
 
+    def __process_language(self, language):
+        lang = language.lower()
+        if lang == 'sotho':
+            return 'Sesotho'
+        elif lang == 'ndebele':
+            return 'North Ndebele'
+        elif lang == 'tsivenda':
+            return 'Tshivenda'
+        else:
+            return language
+
     def _to_story(self, div):
         title_elem = div.find('span', property='dc:title')
         title = ''
@@ -176,17 +187,23 @@ class NalibaliChef(JsonTreeChef):
         image = div.find('img', class_='img-responsive') or div.find('img')
         image_src = image['src'] if image else ''
         thumbnail = image_src.split('?')[0] if NalibaliChef.SUPPORTED_THUMBNAIL_EXTENSIONS.search(image_src) else None
+
+        language_and_hrefs = [None] * len(anchors)
+        for i, (tentative_lang, href) in enumerate([(self.__process_language(self.__get_text(anchor)), anchor['href']) for anchor in anchors]):
+            lang = tentative_lang if getlang_by_name(tentative_lang) or getlang_by_native_name(tentative_lang) else 'English'
+            language_and_hrefs[i] = (lang, href)
+
         story_by_language = {
-            self.__get_text(anchor): dict(
+            language: dict(
                 kind='NalibaliLocalizedStory',
                 title=title,
                 posted_date=posted_date,
                 author=author,
-                language=self.__get_text(anchor),
-                url=self.__absolute_url(anchor['href']),
+                language=language,
+                url=self.__absolute_url(href),
                 thumbnail=thumbnail,
             )
-            for anchor in anchors
+            for language, href in language_and_hrefs
         }
         return dict(
             kind='NalibaliStory',
@@ -334,7 +351,7 @@ class NalibaliChef(JsonTreeChef):
             shutil.copyfileobj(image_response.raw, f)
         img['src'] = relative_url[1:] if relative_url[0] == '/' else relative_url
 
-    def _scrape_multilingual_story(self, story):
+    def _scrape_story_html5(self, story):
         url = story['url']
         page = self._html.get(url)
         story_section = page.find('section', id='section-main')
@@ -383,13 +400,16 @@ class NalibaliChef(JsonTreeChef):
             )],
         )
 
+    def _scrape_multilingual_story(self, story):
+        return self._scrape_story_html5(story)
+
     def _scrape_audio_story(self, story):
         return None
 
     def _scrape_story_card(self, story):
         url = story['url']
         language_str = story['language']
-        language = getlang_by_native_name(language_str)
+        language = getlang_by_name(language_str) or getlang_by_native_name(language_str)
         lang_code = None
         if language:
             lang_code = language.code
@@ -417,10 +437,10 @@ class NalibaliChef(JsonTreeChef):
         raise Exception('Non-PDF version not implemented')
 
     def _scrape_story_seed(self, story):
-        return None
+        return self._scrape_story_html5(story)
 
     def _scrape_your_story(self, story):
-        return None
+        return self._scrape_story_html5(story)
 
     def pre_run(self, args, options):
         self.crawl(args, options)
