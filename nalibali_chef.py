@@ -58,6 +58,9 @@ class Html:
     def get_image(self, url):
         return self._http_session.get(url, stream=True)
 
+    def get_xml(self, url):
+        return BeautifulSoup(self._http_session.get(url).content, 'xml')
+
 # Chef
 class NalibaliChef(JsonTreeChef):
 
@@ -75,6 +78,10 @@ class NalibaliChef(JsonTreeChef):
     STORY_PAGE_LINK_RE = compile(r'^.+page=(?P<page>\d+)$')
     SUPPORTED_THUMBNAIL_EXTENSIONS = compile(r'\.(png|jpg|jpeg)')
     AUTHOR_RE = compile(r'author:', IgnoreCase)
+    AUDIO_STORIES_RE = compile(r'Audio Stories', IgnoreCase)
+    AUDIO_STORY_ANCHOR_RE = compile(r'story-library/audio-stories')
+    IONO_FM_RE = compile(f'iono.fm')
+    RSS_FEED_RE = compile('/rss/chan')
 
     def __init__(self, html, logger):
         super(NalibaliChef, self).__init__(None, None)
@@ -222,7 +229,37 @@ class NalibaliChef(JsonTreeChef):
             stories.extend([story for story in map(self._to_story, content.find_all('div', class_='views-row')) if story])
         return stories
 
+    def _crawl_audio_stories_hierarchy(self, hierarchy):
+        stories_url = hierarchy['url']
+        page  = self._html.get(stories_url)
+        content = page.find('section', id='section-main').find('div', class_='region-content')
+        language_info = [(self.__get_text(anchor), anchor['href']) for anchor in content.find_all('a', attrs={'href': NalibaliChef.AUDIO_STORY_ANCHOR_RE}) if not anchor.get('class') and len(self.__get_text(anchor)) > 2]
+        stories_by_language = {}
+        for lang, url in language_info:
+            language_page = self._html.get(self.__absolute_url(url))
+            language_iono_fm_url = language_page.find('a', attrs={'href': NalibaliChef.IONO_FM_RE })['href']
+            language_iono_fm_page = self._html.get(language_iono_fm_url)
+            rss_url = language_iono_fm_page.find('link', attrs={'href': NalibaliChef.RSS_FEED_RE })['href']
+            rss_page = self._html.get_xml(rss_url)
+            stories_by_language[lang] = [
+                dict(
+                    title=self.__get_text(item.title),
+                    source_id=urlparse(item.enclosure['url'].split('?')[0]).path,
+                    url=item.enclosure['url'].split('?')[0],
+                    content_type=item.enclosure['type'],
+                    description=self.__get_text(item.summary),
+                    pub_date=self.__get_text(item.pubDate),
+                    author=self.__get_text(item.author),
+                    language=lang,
+                    thumbnail=item.thumbnail['href'],
+                ) for item in rss_page.find_all('item')
+            ]
+        return stories_url, stories_by_language
+
     def _crawl_story_hierarchy(self, hierarchy):
+        if NalibaliChef.AUDIO_STORIES_RE.search(hierarchy['title']):
+            return self._crawl_audio_stories_hierarchy(hierarchy)
+
         stories_url = hierarchy['url']
         paginations = self._crawl_pagination(stories_url)
         paginations.insert(0, dict(
