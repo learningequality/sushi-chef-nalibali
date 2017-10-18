@@ -20,7 +20,7 @@ from ricecooker.utils.caching import CacheForeverHeuristic, FileCache, CacheCont
 from ricecooker.utils.html import download_file
 from ricecooker.utils.jsontrees import write_tree_to_json_tree
 from ricecooker.utils.zip import create_predictable_zip
-from ricecooker.classes.nodes import HTML5AppNode
+from ricecooker.classes.nodes import HTML5AppNode, AudioNode
 from ricecooker.classes import files
 
 # Logging settings
@@ -441,17 +441,39 @@ class NalibaliChef(JsonTreeChef):
         return self._scrape_story_html5(story)
 
     def _scrape_audio_story(self, story):
-        return None
+        return dict(
+            kind=content_kinds.AUDIO,
+            source_id=story['source_id'],
+            title=story['title'],
+            license=NalibaliChef.LICENSE,
+            author=story['author'],
+            description=story['description'],
+            domain_ns=NalibaliChef.HOSTNAME,
+            thumbnail=story['thumbnail'],
+            files=[
+                dict(
+                    file_type=content_kinds.AUDIO,
+                    path=story['url'],
+                    language=self.__get_language_code(story['language']),
+                )
+            ]
+        )
 
-    def _scrape_story_card(self, story):
-        url = story['url']
-        language_str = story['language']
+    def __get_language_code(self, language_str):
         language = getlang_by_name(language_str) or getlang_by_native_name(language_str)
         lang_code = None
         if language:
             lang_code = language.code
         else:
+            lang_code = getlang_by_name('English').code
             print('Unknown language:', language_str)
+        return lang_code
+
+
+    def _scrape_story_card(self, story):
+        url = story['url']
+        language_str = story['language']
+        lang_code = self.__get_language_code(language_str)
 
         if url and url.endswith('.pdf'):
             parsed_url = urlparse(url)
