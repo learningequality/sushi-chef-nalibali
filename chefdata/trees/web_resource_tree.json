@@ -4286,7 +4286,7 @@
             "posted_date": "Posted on February 5th, 2016",
             "author": "Vianne Venter",
             "language": "English",
-            "url": "http://nalibali.org/sites/default/files/story-cards/wrad_story_card_english_lr.pdf",
+            "url": "http://nalibali.org/sites/default/files/story-cards/wrad_story_card_seswati_lr.pdf",
             "thumbnail": "http://nalibali.org/sites/default/files/styles/story_thumb/public/story-cards/images/neo-word.jpg"
           },
           {
@@ -4508,6 +4508,15 @@
           },
           {
             "kind": "NalibaliLocalizedStory",
+            "title": "The Feast",
+            "posted_date": "Posted on December 11th, 2016",
+            "author": "Jude Daly",
+            "language": "Sesotho",
+            "url": "http://nalibali.org/sites/default/files/story-cards/the_feast.storycard.sotho_.final_.pdf",
+            "thumbnail": "http://nalibali.org/sites/default/files/styles/story_thumb/public/story-cards/images/fish.png"
+          },
+          {
+            "kind": "NalibaliLocalizedStory",
             "title": "Tselane and the giant",
             "posted_date": "Posted on December 11th, 2016",
             "author": "",
@@ -4541,24 +4550,13 @@
             "language": "Sesotho",
             "url": "http://nalibali.org/sites/default/files/story-cards/sesotho.pdf",
             "thumbnail": "http://nalibali.org/sites/default/files/styles/story_thumb/public/story-cards/images/sisandas-gift.jpg"
-          }
-        ],
-        "Sotho": [
-          {
-            "kind": "NalibaliLocalizedStory",
-            "title": "The Feast",
-            "posted_date": "Posted on December 11th, 2016",
-            "author": "Jude Daly",
-            "language": "Sotho",
-            "url": "http://nalibali.org/sites/default/files/story-cards/the_feast.storycard.sotho_.final_.pdf",
-            "thumbnail": "http://nalibali.org/sites/default/files/styles/story_thumb/public/story-cards/images/fish.png"
           },
           {
             "kind": "NalibaliLocalizedStory",
             "title": "Lion meets his match",
             "posted_date": "Posted on December 11th, 2014",
             "author": "Retold by Joanne Bloch",
-            "language": "Sotho",
+            "language": "Sesotho",
             "url": "http://nalibali.org/sites/default/files/story-cards/lion_meets_his_match.storycard.sotho_1.pdf",
             "thumbnail": "http://nalibali.org/sites/default/files/styles/story_thumb/public/story-cards/images/lion.png"
           },
@@ -4567,7 +4565,7 @@
             "title": "The king of the birds",
             "posted_date": "Posted on December 11th, 2014",
             "author": "Retold by Joanne Bloch",
-            "language": "Sotho",
+            "language": "Sesotho",
             "url": "http://nalibali.org/sites/default/files/story-cards/king-of-birds.storycard.sotho_.final_1.pdf",
             "thumbnail": "http://nalibali.org/sites/default/files/styles/story_thumb/public/story-cards/images/birds.png"
           }
@@ -4695,13 +4693,13 @@
             "thumbnail": "http://nalibali.org/sites/default/files/styles/story_thumb/public/story-cards/images/neo-word.jpg"
           }
         ],
-        "Ndebele": [
+        "North Ndebele": [
           {
             "kind": "NalibaliLocalizedStory",
             "title": "Neo and the big, wide world",
             "posted_date": "Posted on February 5th, 2016",
             "author": "Vianne Venter",
-            "language": "Ndebele",
+            "language": "North Ndebele",
             "url": "http://nalibali.org/sites/default/files/story-cards/wrad_story_card_ndebele_lr.pdf",
             "thumbnail": "http://nalibali.org/sites/default/files/styles/story_thumb/public/story-cards/images/neo-word.jpg"
           },
@@ -4710,20 +4708,9 @@
             "title": "Sisanda\u2019s gift",
             "posted_date": "Posted on February 23rd, 2015",
             "author": "Gcina Mhloph",
-            "language": "Ndebele",
+            "language": "North Ndebele",
             "url": "http://nalibali.org/sites/default/files/story-cards/ndebele.pdf",
             "thumbnail": "http://nalibali.org/sites/default/files/styles/story_thumb/public/story-cards/images/sisandas-gift.jpg"
-          }
-        ],
-        "Seswati": [
-          {
-            "kind": "NalibaliLocalizedStory",
-            "title": "Neo and the big, wide world",
-            "posted_date": "Posted on February 5th, 2016",
-            "author": "Vianne Venter",
-            "language": "Seswati",
-            "url": "http://nalibali.org/sites/default/files/story-cards/wrad_story_card_seswati_lr.pdf",
-            "thumbnail": "http://nalibali.org/sites/default/files/styles/story_thumb/public/story-cards/images/neo-word.jpg"
           }
         ],
         "Setswana": [
@@ -4788,13 +4775,13 @@
             "thumbnail": "http://nalibali.org/sites/default/files/styles/story_thumb/public/story-cards/images/sisandas-gift.jpg"
           }
         ],
-        "Tsivenda": [
+        "Tshivenda": [
           {
             "kind": "NalibaliLocalizedStory",
             "title": "Sisanda\u2019s gift",
             "posted_date": "Posted on February 23rd, 2015",
             "author": "Gcina Mhloph",
-            "language": "Tsivenda",
+            "language": "Tshivenda",
             "url": "http://nalibali.org/sites/default/files/story-cards/wrad_tsivenda.pdf",
             "thumbnail": "http://nalibali.org/sites/default/files/styles/story_thumb/public/story-cards/images/sisandas-gift.jpg"
           }
@@ -5169,13 +5156,13 @@
       "description": "Want to submit your own stories? Check out our selection of poems, stories and writings created by you - or send us your own here!",
       "url": "http://nalibali.org/story-library/your-stories",
       "children": {
-        "Continue reading": [
+        "English": [
           {
             "kind": "NalibaliLocalizedStory",
             "title": "Lucien's Laces",
             "posted_date": "Posted on April 5th, 2017",
             "author": "Portia Primary School together with Miss Melanie Lippert",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/story-library/your-story/luciens-laces",
             "thumbnail": null
           },
@@ -5184,7 +5171,7 @@
             "title": "Thoughts",
             "posted_date": "Posted on November 23rd, 2016",
             "author": "Dikeledi Finger",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/thoughts",
             "thumbnail": null
           },
@@ -5193,7 +5180,7 @@
             "title": "Izivubeko Zobom",
             "posted_date": "Posted on August 20th, 2016",
             "author": "Xhantilomzi",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/izivubeko-zobom",
             "thumbnail": null
           },
@@ -5202,7 +5189,7 @@
             "title": "Boikokobetso",
             "posted_date": "Posted on August 7th, 2016",
             "author": "Albert",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/boikokobetso",
             "thumbnail": null
           },
@@ -5211,7 +5198,7 @@
             "title": "USiqwentshu noZukile",
             "posted_date": "Posted on July 31st, 2016",
             "author": "Pelisa Matshanga",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/usiqwentshu-nozukile",
             "thumbnail": null
           },
@@ -5220,7 +5207,7 @@
             "title": "lions don't laugh",
             "posted_date": "Posted on July 18th, 2016",
             "author": "sitha",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/lions-dont-laugh",
             "thumbnail": null
           },
@@ -5229,7 +5216,7 @@
             "title": "Started from the bottom",
             "posted_date": "Posted on July 15th, 2016",
             "author": "Anele Mqikela",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/started-the-bottom",
             "thumbnail": null
           },
@@ -5238,7 +5225,7 @@
             "title": "Imfundo sisitshixo sobomi",
             "posted_date": "Posted on July 11th, 2016",
             "author": "Sezela Yolanda",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/imfundo-sisitshixo-sobomi",
             "thumbnail": null
           },
@@ -5247,7 +5234,7 @@
             "title": "Dandelion's little garden",
             "posted_date": "Posted on June 21st, 2016",
             "author": "Nondumiso Lamula",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/dandelions-little-garden",
             "thumbnail": null
           },
@@ -5256,7 +5243,7 @@
             "title": "ukungamameli akwakhi ",
             "posted_date": "Posted on June 21st, 2016",
             "author": "momelezi lindwa",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/ukungamameli-akwakhi",
             "thumbnail": null
           },
@@ -5265,7 +5252,7 @@
             "title": "i Mani munghana ",
             "posted_date": "Posted on June 10th, 2016",
             "author": "NTIYISO",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/i-mani-munghana",
             "thumbnail": null
           },
@@ -5274,7 +5261,7 @@
             "title": "The Crayon Family",
             "posted_date": "Posted on June 4th, 2016",
             "author": "Gail Barton",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/the-crayon-family",
             "thumbnail": null
           },
@@ -5283,7 +5270,7 @@
             "title": "UBonita",
             "posted_date": "Posted on May 16th, 2016",
             "author": "Siwaphiwe Fortune",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/ubonita",
             "thumbnail": null
           },
@@ -5292,7 +5279,7 @@
             "title": "Kwezontaba zeCederberg",
             "posted_date": "Posted on May 16th, 2016",
             "author": "Siwaphiwe Fortune",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/kwezontaba-zecederberg",
             "thumbnail": null
           },
@@ -5301,7 +5288,7 @@
             "title": "Nelson Mandela ",
             "posted_date": "Posted on May 8th, 2016",
             "author": "Nthangeni Vhuhwavho (15)",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/nelson-mandela",
             "thumbnail": null
           },
@@ -5310,7 +5297,7 @@
             "title": "HA NGO THETSHELESA KHONANI",
             "posted_date": "Posted on May 7th, 2016",
             "author": "Nthangeni Vhuhwavho",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/ha-ngo-thetshelesa-khonani",
             "thumbnail": null
           },
@@ -5319,7 +5306,7 @@
             "title": "Xhosa is born",
             "posted_date": "Posted on April 12th, 2016",
             "author": "Bonolo Mndila (17) from Westonaria, Gauteng",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/xhosa-born",
             "thumbnail": null
           },
@@ -5328,7 +5315,7 @@
             "title": "Summer\u2026",
             "posted_date": "Posted on April 12th, 2016",
             "author": "Christina Mokome (17) from Westonaria, Gauteng",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/summer%E2%80%A6",
             "thumbnail": null
           },
@@ -5337,7 +5324,7 @@
             "title": "African Renaissance",
             "posted_date": "Posted on April 12th, 2016",
             "author": "Shaun Magowa (Grade 12 learner) from Westonaria, Gauteng",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/african-renaissance",
             "thumbnail": null
           },
@@ -5346,7 +5333,7 @@
             "title": "Ulwandle",
             "posted_date": "Posted on April 12th, 2016",
             "author": "Rethabile Maeena (11 years old) from Ihobe School (Free State)",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/ulwandle",
             "thumbnail": null
           },
@@ -5355,7 +5342,7 @@
             "title": "Inja yam",
             "posted_date": "Posted on April 12th, 2016",
             "author": "Chuma Sitofu (9 years old) from Ihobe School (Free State)",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/inja-yam",
             "thumbnail": null
           },
@@ -5364,7 +5351,7 @@
             "title": "Intaba yobugqi",
             "posted_date": "Posted on April 12th, 2016",
             "author": "Rethabile Maeena (11 years old) from Ihobe School (Free State)",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/intaba-yobugqi",
             "thumbnail": null
           },
@@ -5373,7 +5360,7 @@
             "title": "Who can I help?",
             "posted_date": "Posted on April 12th, 2016",
             "author": "Phemelo Sello (11 years old) from Limpopo",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/who-can-i-help",
             "thumbnail": null
           },
@@ -5382,7 +5369,7 @@
             "title": "I am special because I am me!",
             "posted_date": "Posted on April 12th, 2016",
             "author": "Ami Jackson (8 years old) from Western Cape",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/i-am-special-because-i-am-me",
             "thumbnail": null
           },
@@ -5391,7 +5378,7 @@
             "title": "I like the way I am",
             "posted_date": "Posted on April 12th, 2016",
             "author": "Yola Mpi (9 years old) from Western Cape",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/i-way-i-am",
             "thumbnail": null
           },
@@ -5400,7 +5387,7 @@
             "title": "I\u2019m special because\u2026",
             "posted_date": "Posted on April 12th, 2016",
             "author": "Joshua Peterson (9 years old) from Western Cape",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/i%E2%80%99m-special-because%E2%80%A6",
             "thumbnail": null
           },
@@ -5409,7 +5396,7 @@
             "title": "Build me a world",
             "posted_date": "Posted on April 12th, 2016",
             "author": "Sinazo Qwaqwa (Grade 8) from Butterworth",
-            "language": "Continue reading",
+            "language": "English",
             "url": "http://nalibali.org/your-stories/build-me-world",
             "thumbnail": null
           }
