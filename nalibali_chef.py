@@ -233,7 +233,7 @@ class NalibaliChef(JsonTreeChef):
         stories_url = hierarchy['url']
         page  = self._html.get(stories_url)
         content = page.find('section', id='section-main').find('div', class_='region-content')
-        language_info = [(self.__get_text(anchor), anchor['href']) for anchor in content.find_all('a', attrs={'href': NalibaliChef.AUDIO_STORY_ANCHOR_RE}) if not anchor.get('class') and len(self.__get_text(anchor)) > 2]
+        language_info = [(self.__process_language(self.__get_text(anchor)), anchor['href']) for anchor in content.find_all('a', attrs={'href': NalibaliChef.AUDIO_STORY_ANCHOR_RE}) if not anchor.get('class') and len(self.__get_text(anchor)) > 2]
         stories_by_language = {}
         for lang, url in language_info:
             language_page = self._html.get(self.__absolute_url(url))
