@@ -11,6 +11,7 @@ import tempfile
 import shutil
 import pathlib
 from urllib.parse import urlparse
+from pathlib import PurePosixPath
 
 from le_utils.constants import content_kinds, licenses
 from le_utils.constants.languages import getlang_by_native_name, getlang_by_name
@@ -20,7 +21,7 @@ from ricecooker.utils.caching import CacheForeverHeuristic, FileCache, CacheCont
 from ricecooker.utils.html import download_file
 from ricecooker.utils.jsontrees import write_tree_to_json_tree
 from ricecooker.utils.zip import create_predictable_zip
-from ricecooker.classes.nodes import HTML5AppNode
+from ricecooker.classes.nodes import HTML5AppNode, AudioNode
 from ricecooker.classes import files
 
 # Logging settings
@@ -58,6 +59,12 @@ class Html:
     def get_image(self, url):
         return self._http_session.get(url, stream=True)
 
+    def get_xml(self, url):
+        return BeautifulSoup(self._http_session.get(url).content, 'xml')
+
+    def head(self, url):
+        return self._http_session.head(url)
+
 # Chef
 class NalibaliChef(JsonTreeChef):
 
@@ -75,6 +82,10 @@ class NalibaliChef(JsonTreeChef):
     STORY_PAGE_LINK_RE = compile(r'^.+page=(?P<page>\d+)$')
     SUPPORTED_THUMBNAIL_EXTENSIONS = compile(r'\.(png|jpg|jpeg)')
     AUTHOR_RE = compile(r'author:', IgnoreCase)
+    AUDIO_STORIES_RE = compile(r'Audio Stories', IgnoreCase)
+    AUDIO_STORY_ANCHOR_RE = compile(r'story-library/audio-stories')
+    IONO_FM_RE = compile(f'iono.fm')
+    RSS_FEED_RE = compile('/rss/chan')
 
     def __init__(self, html, logger):
         super(NalibaliChef, self).__init__(None, None)
@@ -222,7 +233,52 @@ class NalibaliChef(JsonTreeChef):
             stories.extend([story for story in map(self._to_story, content.find_all('div', class_='views-row')) if story])
         return stories
 
+    def _crawl_audio_stories_hierarchy(self, hierarchy):
+        stories_url = hierarchy['url']
+        page  = self._html.get(stories_url)
+        content = page.find('section', id='section-main').find('div', class_='region-content')
+        language_info = [(self.__process_language(self.__get_text(anchor)), anchor['href']) for anchor in content.find_all('a', attrs={'href': NalibaliChef.AUDIO_STORY_ANCHOR_RE}) if not anchor.get('class') and len(self.__get_text(anchor)) > 2]
+        stories_by_language = {}
+
+        for lang, url in language_info:
+            language_page = self._html.get(self.__absolute_url(url))
+            language_iono_fm_url = language_page.find('a', attrs={'href': NalibaliChef.IONO_FM_RE })['href']
+            language_iono_fm_page = self._html.get(language_iono_fm_url)
+            rss_url = language_iono_fm_page.find('link', attrs={'href': NalibaliChef.RSS_FEED_RE })['href']
+            rss_page = self._html.get_xml(rss_url)
+            items = rss_page.find_all('item')
+            stories = [None] * len(items)
+
+            for i, item in enumerate(items):
+                url = item.enclosure['url'].split('?')[0]
+                filename = os.path.basename(url)
+                filename_posix = PurePosixPath(filename)
+                filename_no_extension = filename_posix.stem
+                mp3_url = os.path.join(os.path.dirname(url), filename_no_extension) + '.mp3'
+                mp3_version_exists = self._html.head(mp3_url).status_code == 200
+                if not mp3_version_exists:
+                    raise Exception(f'No mp3 version available for {url}')
+                audio_node_url = mp3_url if mp3_version_exists else url
+                parsed_url = urlparse(audio_node_url)
+
+                stories[i] = dict(
+                    title=self.__get_text(item.title),
+                    source_id=parsed_url.path,
+                    url=audio_node_url,
+                    content_type=item.enclosure['type'],
+                    description=self.__get_text(item.summary),
+                    pub_date=self.__get_text(item.pubDate),
+                    author=self.__get_text(item.author),
+                    language=lang,
+                    thumbnail=item.thumbnail['href'],
+                )
+            stories_by_language[lang] = stories
+        return stories_url, stories_by_language
+
     def _crawl_story_hierarchy(self, hierarchy):
+        if NalibaliChef.AUDIO_STORIES_RE.search(hierarchy['title']):
+            return self._crawl_audio_stories_hierarchy(hierarchy)
+
         stories_url = hierarchy['url']
         paginations = self._crawl_pagination(stories_url)
         paginations.insert(0, dict(
@@ -404,17 +460,39 @@ class NalibaliChef(JsonTreeChef):
         return self._scrape_story_html5(story)
 
     def _scrape_audio_story(self, story):
-        return None
+        return dict(
+            kind=content_kinds.AUDIO,
+            source_id=story['source_id'],
+            title=story['title'],
+            license=NalibaliChef.LICENSE,
+            author=story['author'],
+            description=story['description'],
+            domain_ns=NalibaliChef.HOSTNAME,
+            thumbnail=story['thumbnail'],
+            files=[
+                dict(
+                    file_type=content_kinds.AUDIO,
+                    path=story['url'],
+                    language=self.__get_language_code(story['language']),
+                )
+            ]
+        )
 
-    def _scrape_story_card(self, story):
-        url = story['url']
-        language_str = story['language']
+    def __get_language_code(self, language_str):
         language = getlang_by_name(language_str) or getlang_by_native_name(language_str)
         lang_code = None
         if language:
             lang_code = language.code
         else:
+            lang_code = getlang_by_name('English').code
             print('Unknown language:', language_str)
+        return lang_code
+
+
+    def _scrape_story_card(self, story):
+        url = story['url']
+        language_str = story['language']
+        lang_code = self.__get_language_code(language_str)
 
         if url and url.endswith('.pdf'):
             parsed_url = urlparse(url)
