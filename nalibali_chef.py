@@ -24,7 +24,6 @@ from ricecooker.utils.zip import create_predictable_zip
 from ricecooker.classes.nodes import HTML5AppNode, AudioNode
 from ricecooker.classes import files
 
-# Logging settings
 def create_logger():
     logging.getLogger("cachecontrol.controller").setLevel(logging.WARNING)
     logging.getLogger("requests.packages").setLevel(logging.WARNING)
@@ -65,10 +64,10 @@ class Html:
     def head(self, url):
         return self._http_session.head(url)
 
-# Chef
+#region Nalibali Chef
 class NalibaliChef(JsonTreeChef):
 
-    # Constants
+    #region Constants
     HOSTNAME = 'nalibali.org'
     ROOT_URL = f'http://{HOSTNAME}/story-library'
     DATA_DIR = 'chefdata'
@@ -77,8 +76,10 @@ class NalibaliChef(JsonTreeChef):
     SCRAPING_STAGE_OUTPUT = 'ricecooker_json_tree.json'
     ZIP_FILES_TMP_DIR = os.path.join(DATA_DIR, 'zipfiles')
     LICENSE = get_license(licenses.CC_BY_NC_ND, copyright_holder="Nal'ibali").as_dict()
+    ENGLISH_LANGUAGE_CODE = getlang_by_name('English').code
+    #endregion Constants
 
-    # Matching regexes
+    #region Regexes
     STORY_PAGE_LINK_RE = compile(r'^.+page=(?P<page>\d+)$')
     SUPPORTED_THUMBNAIL_EXTENSIONS = compile(r'\.(png|jpg|jpeg)')
     AUTHOR_RE = compile(r'author:', IgnoreCase)
@@ -86,13 +87,14 @@ class NalibaliChef(JsonTreeChef):
     AUDIO_STORY_ANCHOR_RE = compile(r'story-library/audio-stories')
     IONO_FM_RE = compile(f'iono.fm')
     RSS_FEED_RE = compile('/rss/chan')
+    #endregion Regexes
 
     def __init__(self, html, logger):
         super(NalibaliChef, self).__init__(None, None)
         self._html = html
         self._logger = logger
 
-
+    #region Helper functions
     def __absolute_url(self, url):
         if url.startswith("//"):
             return "https:" + url
@@ -109,7 +111,60 @@ class NalibaliChef(JsonTreeChef):
         new_text, _ = NalibaliChef.AUTHOR_RE.subn('', text)
         return new_text.strip()
 
-    def __to_story_hierarchy(self, div):
+    def __process_language(self, language):
+        lang = language.lower()
+        if lang == 'sotho':
+            return 'Sesotho'
+        elif lang == 'ndebele':
+            return 'North Ndebele'
+        elif lang == 'tsivenda':
+            return 'Tshivenda'
+        elif lang == 'seswati':
+            return 'SiSwati'
+        elif lang == 'tsw':
+            return 'Setswana'
+        elif lang == 'continue reading':
+            return 'English'
+        return language
+
+    def __get_language_code(self, language_str):
+        language = getlang_by_name(language_str) or getlang_by_native_name(language_str)
+        if language:
+            return language.code
+        else:
+            print('Unknown language:', language_str)
+            return NalibaliChef.ENGLISH_LANGUAGE_CODE
+
+    #endregion Helper functions
+
+    #region Crawling
+    def crawl(self, args, options):
+        root_page = self._html.get(NalibaliChef.ROOT_URL)
+        story_hierarchies = self._crawl_story_hierarchies(root_page)
+        web_resource_tree = dict(
+            kind='NalibaliWebResourceTree',
+            title="Nal'ibali Web Resource Tree",
+            language='en',
+            children=story_hierarchies,
+        )
+        json_file_name = os.path.join(NalibaliChef.TREES_DATA_DIR, NalibaliChef.CRAWLING_STAGE_OUTPUT)
+        with open(json_file_name, 'w') as json_file:
+            json.dump(web_resource_tree, json_file, indent=2)
+            self._logger.info('Crawling results stored in ' + json_file_name)
+        return story_hierarchies
+
+    def _crawl_story_hierarchies(self, page):
+        content_div = page.find('div', class_='region-content')
+        vocabulary_div = content_div.find('div', class_='view-vocabulary')
+        stories_divs = vocabulary_div.find_all('div', 'views-row')
+        story_hierarchies = [h for h in map(self._crawl_to_story_hierarchy, stories_divs)]
+        stories_dict = dict(map(self._crawl_story_hierarchy, story_hierarchies))
+        for h in story_hierarchies:
+            stories = stories_dict.get(h['url'], {})
+            h['children'] = stories
+        return story_hierarchies
+
+    def _crawl_to_story_hierarchy(self, div):
         title = self.__get_text(div.find('h2'))
         image_url = div.find('img', class_='img-responsive')['src']
         body_text = self.__get_text(div.find('div', class_='body'))
@@ -122,18 +177,56 @@ class NalibaliChef(JsonTreeChef):
             url=stories_url,
         )
 
-    def _crawl_story_hierarchies(self, page):
-        content_div = page.find('div', class_='region-content')
-        vocabulary_div = content_div.find('div', class_='view-vocabulary')
-        stories_divs = vocabulary_div.find_all('div', 'views-row')
-        story_hierarchies = [h for h in map(self.__to_story_hierarchy, stories_divs)]
-        stories_dict = dict(map(self._crawl_story_hierarchy, story_hierarchies))
-        for h in story_hierarchies:
-            stories = stories_dict.get(h['url'], {})
-            h['children'] = stories
-        return story_hierarchies
+    def _crawl_story_hierarchy(self, hierarchy):
+        if NalibaliChef.AUDIO_STORIES_RE.search(hierarchy['title']):
+            return self._crawl_audio_stories_hierarchy(hierarchy)
 
-    def _to_pagination(self, anchor):
+        stories_url = hierarchy['url']
+        paginations = self._crawl_pagination(stories_url)
+        paginations.insert(0, dict(
+                kind='NalibaliPagination',
+                url=stories_url,
+                page=0,
+                name='1',
+            ))
+        all_stories_by_bucket = list(map(self._crawl_pagination_stories, paginations))
+        stories_by_language = {}
+        for stories_bucket in all_stories_by_bucket:
+            for story in stories_bucket:
+                for lang, story in story['supported_languages'].items():
+                    by_language = stories_by_language.get(lang)
+                    if not by_language:
+                        by_language = (set(), [])
+                        stories_by_language[lang] = by_language
+                    uniques, stories = by_language
+                    url = story['url']
+                    if url not in uniques:
+                        stories.append(story)
+                    uniques.add(url)
+        for lang, (uniques, stories) in stories_by_language.items():
+            stories_by_language[lang] = stories
+        return stories_url, stories_by_language
+
+    def _crawl_pagination(self, url):
+        page = self._html.get(url)
+        pagination_ul = page.find('ul', class_='pagination')
+
+        if not pagination_ul:
+            return []
+
+        anchors = pagination_ul.find_all('a', attrs={'href': NalibaliChef.STORY_PAGE_LINK_RE})
+        paginations = list(map(self._crawl_to_pagination, anchors))
+        paginations_dict = {p['page']: p for p in paginations}
+        actual_paginations = [p for p in paginations if ('next' not in p['name']  and 'last' not in p['name'] and 'first' not in p['name'] and 'previous' not in p['name'] and '>' not in p['name'] and p['name'] != '')]
+        last = paginations_dict.get('last')
+        if not last:
+            return actual_paginations
+        current_last = actual_paginations[-1]
+        if current_last['page'] == last['page']:
+            return actual_paginations
+        return actual_paginations.extend(self._crawl_pagination(current_last['url']))
+
+    def _crawl_to_pagination(self, anchor):
         href = anchor['href']
         m = NalibaliChef.STORY_PAGE_LINK_RE.match(href)
         if not m:
@@ -147,37 +240,16 @@ class NalibaliChef(JsonTreeChef):
         )
         return pagination
 
-    def _crawl_pagination(self, url):
+    def _crawl_pagination_stories(self, pagination):
+        url = pagination['url']
         page = self._html.get(url)
-        pagination_ul = page.find('ul', class_='pagination')
+        content_views = page.find_all('div', class_='view-content')
+        stories = []
+        for content in content_views:
+            stories.extend([story for story in map(self._crawl_to_story, content.find_all('div', class_='views-row')) if story])
+        return stories
 
-        if not pagination_ul:
-            return []
-
-        anchors = pagination_ul.find_all('a', attrs={'href': NalibaliChef.STORY_PAGE_LINK_RE})
-        paginations = list(map(self._to_pagination, anchors))
-        paginations_dict = {p['page']: p for p in paginations}
-        actual_paginations = [p for p in paginations if ('next' not in p['name']  and 'last' not in p['name'] and 'first' not in p['name'] and 'previous' not in p['name'] and '>' not in p['name'] and p['name'] != '')]
-        last = paginations_dict.get('last')
-        if not last:
-            return actual_paginations
-        current_last = actual_paginations[-1]
-        if current_last['page'] == last['page']:
-            return actual_paginations
-        return actual_paginations.extend(self._crawl_pagination(current_last['url']))
-
-    def __process_language(self, language):
-        lang = language.lower()
-        if lang == 'sotho':
-            return 'Sesotho'
-        elif lang == 'ndebele':
-            return 'North Ndebele'
-        elif lang == 'tsivenda':
-            return 'Tshivenda'
-        else:
-            return language
-
-    def _to_story(self, div):
+    def _crawl_to_story(self, div):
         title_elem = div.find('span', property='dc:title')
         title = ''
         if title_elem:
@@ -198,12 +270,7 @@ class NalibaliChef(JsonTreeChef):
         image = div.find('img', class_='img-responsive') or div.find('img')
         image_src = image['src'] if image else ''
         thumbnail = image_src.split('?')[0] if NalibaliChef.SUPPORTED_THUMBNAIL_EXTENSIONS.search(image_src) else None
-
-        language_and_hrefs = [None] * len(anchors)
-        for i, (tentative_lang, href) in enumerate([(self.__process_language(self.__get_text(anchor)), anchor['href']) for anchor in anchors]):
-            lang = tentative_lang if getlang_by_name(tentative_lang) or getlang_by_native_name(tentative_lang) else 'English'
-            language_and_hrefs[i] = (lang, href)
-
+        language_and_hrefs = [(self.__process_language(self.__get_text(anchor)), anchor['href']) for anchor in anchors]
         story_by_language = {
             language: dict(
                 kind='NalibaliLocalizedStory',
@@ -223,15 +290,6 @@ class NalibaliChef(JsonTreeChef):
             author=author,
             supported_languages=story_by_language,
         )
-
-    def _crawl_pagination_stories(self, pagination):
-        url = pagination['url']
-        page = self._html.get(url)
-        content_views = page.find_all('div', class_='view-content')
-        stories = []
-        for content in content_views:
-            stories.extend([story for story in map(self._to_story, content.find_all('div', class_='views-row')) if story])
-        return stories
 
     def _crawl_audio_stories_hierarchy(self, hierarchy):
         stories_url = hierarchy['url']
@@ -275,53 +333,9 @@ class NalibaliChef(JsonTreeChef):
             stories_by_language[lang] = stories
         return stories_url, stories_by_language
 
-    def _crawl_story_hierarchy(self, hierarchy):
-        if NalibaliChef.AUDIO_STORIES_RE.search(hierarchy['title']):
-            return self._crawl_audio_stories_hierarchy(hierarchy)
+    #endregion Crawling
 
-        stories_url = hierarchy['url']
-        paginations = self._crawl_pagination(stories_url)
-        paginations.insert(0, dict(
-                kind='NalibaliPagination',
-                url=stories_url,
-                page=0,
-                name='1',
-            ))
-        all_stories_by_bucket = list(map(self._crawl_pagination_stories, paginations))
-        stories_by_language = {}
-        for stories_bucket in all_stories_by_bucket:
-            for story in stories_bucket:
-                for lang, story in story['supported_languages'].items():
-                    by_language = stories_by_language.get(lang)
-                    if not by_language:
-                        by_language = (set(), [])
-                        stories_by_language[lang] = by_language
-                    uniques, stories = by_language
-                    url = story['url']
-                    if url not in uniques:
-                        stories.append(story)
-                    uniques.add(url)
-        for lang, (uniques, stories) in stories_by_language.items():
-            stories_by_language[lang] = stories
-        return stories_url, stories_by_language
-
-    # Crawling
-    def crawl(self, args, options):
-        root_page = self._html.get(NalibaliChef.ROOT_URL)
-        story_hierarchies = self._crawl_story_hierarchies(root_page)
-        web_resource_tree = dict(
-            kind='NalibaliWebResourceTree',
-            title="Nal'ibali Web Resource Tree",
-            language='en',
-            children=story_hierarchies,
-        )
-        json_file_name = os.path.join(NalibaliChef.TREES_DATA_DIR, NalibaliChef.CRAWLING_STAGE_OUTPUT)
-        with open(json_file_name, 'w') as json_file:
-            json.dump(web_resource_tree, json_file, indent=2)
-            self._logger.info('Crawling results stored in ' + json_file_name)
-        return story_hierarchies
-
-    # Scraping
+    #region Scraping
     def scrape(self, args, options):
         kwargs = {}     # combined dictionary of argparse args and extra options
         kwargs.update(args)
@@ -376,6 +390,58 @@ class NalibaliChef(JsonTreeChef):
             thumbnail=hierarchy['thumbnail'],
         )
 
+    def _scrape_multilingual_story(self, story):
+        return self._scrape_story_html5(story)
+
+    def _scrape_audio_story(self, story):
+        return dict(
+            kind=content_kinds.AUDIO,
+            source_id=story['source_id'],
+            title=story['title'],
+            license=NalibaliChef.LICENSE,
+            author=story['author'],
+            description=story['description'],
+            domain_ns=NalibaliChef.HOSTNAME,
+            thumbnail=story['thumbnail'],
+            files=[
+                dict(
+                    file_type=content_kinds.AUDIO,
+                    path=story['url'],
+                    language=self.__get_language_code(story['language']),
+                )
+            ]
+        )
+
+    def _scrape_story_card(self, story):
+        url = story['url']
+        language_str = story['language']
+        lang_code = self.__get_language_code(language_str)
+
+        if url and url.endswith('.pdf'):
+            parsed_url = urlparse(url)
+            return dict(
+                source_id=parsed_url.path,
+                kind=content_kinds.DOCUMENT,
+                title=story['title'],
+                # description=story['description'],
+                license=NalibaliChef.LICENSE,
+                author=story['author'],
+                thumbnail=story['thumbnail'],
+                language=lang_code,
+                files=[
+                    dict(
+                        file_type=content_kinds.DOCUMENT,
+                        path=url,
+                    )
+                ]
+            )
+        raise Exception('Non-PDF version not implemented')
+
+    def _scrape_story_seed(self, story):
+        return self._scrape_story_html5(story)
+
+    def _scrape_your_story(self, story):
+        return self._scrape_story_html5(story)
 
     def _scrape_download_image(self, base_path, img):
         url = img['src']
@@ -418,7 +484,7 @@ class NalibaliChef(JsonTreeChef):
             links_section.extract()
 
         title = self.__get_text(story_section.find('h1', class_='page-header'))
-        language_code = getlang_by_native_name(story['language']).code
+        language_code = self.__get_language_code(story['language'])
         dest_path = tempfile.mkdtemp(dir=NalibaliChef.ZIP_FILES_TMP_DIR)
 
         for img in story_section.find_all('img'):
@@ -456,74 +522,13 @@ class NalibaliChef(JsonTreeChef):
             )],
         )
 
-    def _scrape_multilingual_story(self, story):
-        return self._scrape_story_html5(story)
-
-    def _scrape_audio_story(self, story):
-        return dict(
-            kind=content_kinds.AUDIO,
-            source_id=story['source_id'],
-            title=story['title'],
-            license=NalibaliChef.LICENSE,
-            author=story['author'],
-            description=story['description'],
-            domain_ns=NalibaliChef.HOSTNAME,
-            thumbnail=story['thumbnail'],
-            files=[
-                dict(
-                    file_type=content_kinds.AUDIO,
-                    path=story['url'],
-                    language=self.__get_language_code(story['language']),
-                )
-            ]
-        )
-
-    def __get_language_code(self, language_str):
-        language = getlang_by_name(language_str) or getlang_by_native_name(language_str)
-        lang_code = None
-        if language:
-            lang_code = language.code
-        else:
-            lang_code = getlang_by_name('English').code
-            print('Unknown language:', language_str)
-        return lang_code
-
-
-    def _scrape_story_card(self, story):
-        url = story['url']
-        language_str = story['language']
-        lang_code = self.__get_language_code(language_str)
-
-        if url and url.endswith('.pdf'):
-            parsed_url = urlparse(url)
-            return dict(
-                source_id=parsed_url.path,
-                kind=content_kinds.DOCUMENT,
-                title=story['title'],
-                # description=story['description'],
-                license=NalibaliChef.LICENSE,
-                author=story['author'],
-                thumbnail=story['thumbnail'],
-                language=lang_code,
-                files=[
-                    dict(
-                        file_type=content_kinds.DOCUMENT,
-                        path=url,
-                    )
-                ]
-            )
-        raise Exception('Non-PDF version not implemented')
-
-    def _scrape_story_seed(self, story):
-        return self._scrape_story_html5(story)
-
-    def _scrape_your_story(self, story):
-        return self._scrape_story_html5(story)
+    #endregion Scraping
 
     def pre_run(self, args, options):
         self.crawl(args, options)
         self.scrape(args, options)
 
+#endregion Nalibali Chef
 
 def __get_testing_chef():
     http_session = create_http_session(NalibaliChef.HOSTNAME)
