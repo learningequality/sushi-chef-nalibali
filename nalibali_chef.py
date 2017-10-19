@@ -11,6 +11,7 @@ import tempfile
 import shutil
 import pathlib
 from urllib.parse import urlparse
+from pathlib import PurePosixPath
 
 from le_utils.constants import content_kinds, licenses
 from le_utils.constants.languages import getlang_by_native_name, getlang_by_name
@@ -60,6 +61,9 @@ class Html:
 
     def get_xml(self, url):
         return BeautifulSoup(self._http_session.get(url).content, 'xml')
+
+    def head(self, url):
+        return self._http_session.head(url)
 
 # Chef
 class NalibaliChef(JsonTreeChef):
@@ -241,19 +245,33 @@ class NalibaliChef(JsonTreeChef):
             language_iono_fm_page = self._html.get(language_iono_fm_url)
             rss_url = language_iono_fm_page.find('link', attrs={'href': NalibaliChef.RSS_FEED_RE })['href']
             rss_page = self._html.get_xml(rss_url)
-            stories_by_language[lang] = [
-                dict(
+            items = rss_page.find_all('item')
+            stories = [None] * len(items)
+            
+            for i, item in enumerate(items):
+                url = item.enclosure['url'].split('?')[0]
+                filename = os.path.basename(url)
+                filename_posix = PurePosixPath(filename)
+                filename_no_extension = filename_posix.stem
+                mp3_url = os.path.join(os.path.dirname(url), filename_no_extension) + '.mp3'
+                mp3_version_exists = self._html.head(mp3_url).status_code == 200
+                if not mp3_version_exists:
+                    raise Exception(f'No mp3 version available for {url}')
+                audio_node_url = mp3_url if mp3_version_exists else url
+                parsed_url = urlparse(audio_node_url)
+
+                stories[i] = dict(
                     title=self.__get_text(item.title),
-                    source_id=urlparse(item.enclosure['url'].split('?')[0]).path,
-                    url=item.enclosure['url'].split('?')[0],
+                    source_id=parsed_url.path,
+                    url=audio_node_url,
                     content_type=item.enclosure['type'],
                     description=self.__get_text(item.summary),
                     pub_date=self.__get_text(item.pubDate),
                     author=self.__get_text(item.author),
                     language=lang,
                     thumbnail=item.thumbnail['href'],
-                ) for item in rss_page.find_all('item')
-            ]
+                )
+            stories_by_language[lang] = stories
         return stories_url, stories_by_language
 
     def _crawl_story_hierarchy(self, hierarchy):
