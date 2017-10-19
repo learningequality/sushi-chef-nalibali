@@ -120,7 +120,7 @@ class NalibaliChef(JsonTreeChef):
         elif lang == 'tsivenda':
             return 'Tshivenda'
         elif lang == 'seswati':
-            return 'SiSwati'
+            return 'Siswati'
         elif lang == 'tsw':
             return 'Setswana'
         elif lang == 'continue reading':
