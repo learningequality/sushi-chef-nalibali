@@ -239,6 +239,7 @@ class NalibaliChef(JsonTreeChef):
         content = page.find('section', id='section-main').find('div', class_='region-content')
         language_info = [(self.__process_language(self.__get_text(anchor)), anchor['href']) for anchor in content.find_all('a', attrs={'href': NalibaliChef.AUDIO_STORY_ANCHOR_RE}) if not anchor.get('class') and len(self.__get_text(anchor)) > 2]
         stories_by_language = {}
+
         for lang, url in language_info:
             language_page = self._html.get(self.__absolute_url(url))
             language_iono_fm_url = language_page.find('a', attrs={'href': NalibaliChef.IONO_FM_RE })['href']
@@ -247,7 +248,7 @@ class NalibaliChef(JsonTreeChef):
             rss_page = self._html.get_xml(rss_url)
             items = rss_page.find_all('item')
             stories = [None] * len(items)
-            
+
             for i, item in enumerate(items):
                 url = item.enclosure['url'].split('?')[0]
                 filename = os.path.basename(url)
