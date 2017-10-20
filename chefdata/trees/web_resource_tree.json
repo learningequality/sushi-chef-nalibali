@@ -9882,15 +9882,24 @@
             "thumbnail": "http://nalibali.org/sites/default/files/styles/story_thumb/public/story-cards/images/sisandas-gift.jpg"
           }
         ],
-        "SiSwati": [
+        "Siswati": [
           {
             "kind": "NalibaliLocalizedStory",
             "title": "Neo and the big, wide world",
             "posted_date": "Posted on February 5th, 2016",
             "author": "Vianne Venter",
-            "language": "SiSwati",
+            "language": "Siswati",
             "url": "http://nalibali.org/sites/default/files/story-cards/wrad_story_card_seswati_lr.pdf",
             "thumbnail": "http://nalibali.org/sites/default/files/styles/story_thumb/public/story-cards/images/neo-word.jpg"
+          },
+          {
+            "kind": "NalibaliLocalizedStory",
+            "title": "Sisanda\u2019s gift",
+            "posted_date": "Posted on February 23rd, 2015",
+            "author": "Gcina Mhloph",
+            "language": "Siswati",
+            "url": "http://nalibali.org/sites/default/files/story-cards/siswati.pdf",
+            "thumbnail": "http://nalibali.org/sites/default/files/styles/story_thumb/public/story-cards/images/sisandas-gift.jpg"
           }
         ],
         "Setswana": [
@@ -9942,17 +9951,6 @@
             "language": "Venda",
             "url": "http://nalibali.org/sites/default/files/story-cards/wrad_story_card_venda_lr.pdf",
             "thumbnail": "http://nalibali.org/sites/default/files/styles/story_thumb/public/story-cards/images/neo-word.jpg"
-          }
-        ],
-        "Siswati": [
-          {
-            "kind": "NalibaliLocalizedStory",
-            "title": "Sisanda\u2019s gift",
-            "posted_date": "Posted on February 23rd, 2015",
-            "author": "Gcina Mhloph",
-            "language": "Siswati",
-            "url": "http://nalibali.org/sites/default/files/story-cards/siswati.pdf",
-            "thumbnail": "http://nalibali.org/sites/default/files/styles/story_thumb/public/story-cards/images/sisandas-gift.jpg"
           }
         ],
         "Tshivenda": [
@@ -10578,6 +10576,123 @@
             "author": "Sinazo Qwaqwa (Grade 8) from Butterworth",
             "language": "English",
             "url": "http://nalibali.org/your-stories/build-me-world",
+            "thumbnail": null
+          },
+          {
+            "kind": "NalibaliLocalizedStory",
+            "title": "Goodbye",
+            "posted_date": "Posted on April 12th, 2016",
+            "author": "Sinazo Qwaqwa (Grade 8) from Butterworth",
+            "language": "English",
+            "url": "http://nalibali.org/your-stories/goodbye",
+            "thumbnail": null
+          },
+          {
+            "kind": "NalibaliLocalizedStory",
+            "title": "Speak",
+            "posted_date": "Posted on April 12th, 2016",
+            "author": "Ruth Everson from Johannesburg",
+            "language": "English",
+            "url": "http://nalibali.org/your-stories/speak",
+            "thumbnail": null
+          },
+          {
+            "kind": "NalibaliLocalizedStory",
+            "title": "My little sister",
+            "posted_date": "Posted on April 12th, 2016",
+            "author": "Ntombovuyo Ngaphu (19) from Umtata",
+            "language": "English",
+            "url": "http://nalibali.org/your-stories/my-little-sister",
+            "thumbnail": null
+          },
+          {
+            "kind": "NalibaliLocalizedStory",
+            "title": "My Grandmother\u2019s Tales",
+            "posted_date": "Posted on April 12th, 2016",
+            "author": "Thulisa Mayekiso from Western Cape",
+            "language": "English",
+            "url": "http://nalibali.org/your-stories/my-grandmother%E2%80%99s-tales",
+            "thumbnail": null
+          },
+          {
+            "kind": "NalibaliLocalizedStory",
+            "title": "Kamohelo Ramaipato",
+            "posted_date": "Posted on April 12th, 2016",
+            "author": "Kamohelo Ramaipato from Western Cape",
+            "language": "English",
+            "url": "http://nalibali.org/your-stories/kamohelo-ramaipato",
+            "thumbnail": null
+          },
+          {
+            "kind": "NalibaliLocalizedStory",
+            "title": "Amahle Fani\u2019s Family Story",
+            "posted_date": "Posted on April 12th, 2016",
+            "author": "Amahle Fani from Western Cape",
+            "language": "English",
+            "url": "http://nalibali.org/your-stories/amahle-fani%E2%80%99s-family-story",
+            "thumbnail": null
+          },
+          {
+            "kind": "NalibaliLocalizedStory",
+            "title": "Nonjabulo Radebe\u2019s Heritage Day Story",
+            "posted_date": "Posted on April 12th, 2016",
+            "author": "Nonjabulo Radebe (14) from KZN",
+            "language": "English",
+            "url": "http://nalibali.org/your-stories/nonjabulo-radebe%E2%80%99s-heritage-day-story",
+            "thumbnail": null
+          },
+          {
+            "kind": "NalibaliLocalizedStory",
+            "title": "If all the world were paper: Translated",
+            "posted_date": "Posted on April 12th, 2016",
+            "author": "Reading club from Westonaria",
+            "language": "English",
+            "url": "http://nalibali.org/your-stories/if-all-world-were-paper-translated",
+            "thumbnail": null
+          },
+          {
+            "kind": "NalibaliLocalizedStory",
+            "title": "The boerewors man",
+            "posted_date": "Posted on April 12th, 2016",
+            "author": "Kiera-Lee Hayes (12) from Cape Town",
+            "language": "English",
+            "url": "http://nalibali.org/your-stories/boerewors-man",
+            "thumbnail": null
+          },
+          {
+            "kind": "NalibaliLocalizedStory",
+            "title": "My Family Story: Do not cast the trusted ones away for new untested ones",
+            "posted_date": "Posted on March 31st, 2016",
+            "author": "Amahle Fani",
+            "language": "English",
+            "url": "http://nalibali.org/your-stories/my-family-story-do-not-cast-trusted-ones-away-new-untested-ones",
+            "thumbnail": null
+          },
+          {
+            "kind": "NalibaliLocalizedStory",
+            "title": "Thamsanqa Makayi\u2019s Family Story",
+            "posted_date": "Posted on March 31st, 2016",
+            "author": "NA",
+            "language": "English",
+            "url": "http://nalibali.org/your-stories/thamsanqa-makayi%E2%80%99s-family-story",
+            "thumbnail": null
+          },
+          {
+            "kind": "NalibaliLocalizedStory",
+            "title": "The clever man",
+            "posted_date": "Posted on March 31st, 2016",
+            "author": "Nonjabulo Radebe",
+            "language": "English",
+            "url": "http://nalibali.org/your-stories/clever-man",
+            "thumbnail": null
+          },
+          {
+            "kind": "NalibaliLocalizedStory",
+            "title": "The Cat and Mouse",
+            "posted_date": "Posted on March 31st, 2016",
+            "author": "Nonnyminaj Natasha",
+            "language": "English",
+            "url": "http://nalibali.org/your-stories/cat-and-mouse",
             "thumbnail": null
           }
         ]

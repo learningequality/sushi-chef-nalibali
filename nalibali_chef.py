@@ -216,15 +216,22 @@ class NalibaliChef(JsonTreeChef):
 
         anchors = pagination_ul.find_all('a', attrs={'href': NalibaliChef.STORY_PAGE_LINK_RE})
         paginations = list(map(self._crawl_to_pagination, anchors))
-        paginations_dict = {p['page']: p for p in paginations}
-        actual_paginations = [p for p in paginations if ('next' not in p['name']  and 'last' not in p['name'] and 'first' not in p['name'] and 'previous' not in p['name'] and '>' not in p['name'] and p['name'] != '')]
+        paginations_dict = {p['name']: p for p in paginations}
+        actual_paginations = [p for p in paginations if ('next' not in p['name']  and 'last' not in p['name'] and 'first' not in p['name'] and 'previous' not in p['name'] and '>' not in p['name'] and '‹' not in p['name'] and p['name'] != '')]
         last = paginations_dict.get('last')
+
+        # This is to handle Story Cards hierarchy, since it does not have a <<last>> pagination item
         if not last:
             return actual_paginations
+
         current_last = actual_paginations[-1]
         if current_last['page'] == last['page']:
             return actual_paginations
-        return actual_paginations.extend(self._crawl_pagination(current_last['url']))
+        else:
+            seen = set()
+            return [x for x in actual_paginations + self._crawl_pagination(current_last['url'])
+                if x['page'] not in seen and not seen.add(x['page'])
+            ]
 
     def _crawl_to_pagination(self, anchor):
         href = anchor['href']
@@ -232,13 +239,15 @@ class NalibaliChef(JsonTreeChef):
         if not m:
             raise Exception('STORY_PAGE_LINK_RE could not match')
         groups = m.groupdict()
-        pagination=dict(
+        text = self.__get_text(anchor)
+        parts = text.split()
+        name = parts[0] if len(parts) > 0 else text
+        return dict(
             kind='NalibaliPagination',
             url=self.__absolute_url(href),
             page=groups['page'],
-            name=self.__get_text(anchor),
+            name=name,
         )
-        return pagination
 
     def _crawl_pagination_stories(self, pagination):
         url = pagination['url']
