@@ -85,8 +85,8 @@ class NalibaliChef(JsonTreeChef):
     AUTHOR_RE = compile(r'author:', IgnoreCase)
     AUDIO_STORIES_RE = compile(r'Audio Stories', IgnoreCase)
     AUDIO_STORY_ANCHOR_RE = compile(r'story-library/audio-stories')
-    IONO_FM_RE = compile(f'iono.fm')
-    RSS_FEED_RE = compile('/rss/chan')
+    IONO_FM_RE = compile(r'iono.fm')
+    RSS_FEED_RE = compile(r'/rss/chan')
     #endregion Regexes
 
     def __init__(self, html, logger):
