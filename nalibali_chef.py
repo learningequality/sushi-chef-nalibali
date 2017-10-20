@@ -523,7 +523,7 @@ class NalibaliChef(JsonTreeChef):
             source_id=parsed_story_url.path if parsed_story_url else url,
             title=title,
             language=language_code,
-            description='',
+            description=story['description'],
             license=NalibaliChef.LICENSE,
             thumbnail=story['thumbnail'],
             files=[dict(
