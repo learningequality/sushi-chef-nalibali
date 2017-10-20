@@ -274,6 +274,7 @@ class NalibaliChef(JsonTreeChef):
 
         posted_date = self.__get_text(div.find('div', class_='field-date'))
         author = self.__sanitize_author(self.__get_text(div.find('div', class_='field-author')))
+        description = self.__get_text(div.find('div', class_='field-body'))
         links = div.find('div', class_='links')
         anchors = links.find_all('a') if links else []
         image = div.find('img', class_='img-responsive') or div.find('img')
@@ -284,6 +285,7 @@ class NalibaliChef(JsonTreeChef):
             language: dict(
                 kind='NalibaliLocalizedStory',
                 title=title,
+                description=description,
                 posted_date=posted_date,
                 author=author,
                 language=language,
@@ -432,7 +434,7 @@ class NalibaliChef(JsonTreeChef):
                 source_id=parsed_url.path,
                 kind=content_kinds.DOCUMENT,
                 title=story['title'],
-                # description=story['description'],
+                description=story['description'],
                 license=NalibaliChef.LICENSE,
                 author=story['author'],
                 thumbnail=story['thumbnail'],
